@@ -16,6 +16,14 @@ export class PoolManager {
         return this._instance;
     }
 
+    // 销毁单例，关卡切换调用
+    static destroyInstance() {
+        if (this._instance) {
+            this._instance.clearAllPool();
+            this._instance = null;
+        }
+    }
+
 
     public getNode(prefab:Prefab, parent:Node){
         let name = prefab.name;
@@ -30,7 +38,7 @@ export class PoolManager {
                 node = instantiate(prefab);
             }
         }else{
-            let pool = new NodePool();
+            pool = new NodePool();
             this._dictPool[name] = pool;
             node = instantiate(prefab);
         }
@@ -55,7 +63,15 @@ export class PoolManager {
             this._dictPool[name] = pool;
         }
 
+        node.active = false;
         pool.put(node);
+    }
+
+    public clearAllPool() {
+        for (const key in this._dictPool) {
+            this.clearPool(key);
+        }
+        this._dictPool = {};
     }
 
     public clearPool(name:string){
@@ -71,6 +87,7 @@ export class PoolManager {
         this._dictPool[name] = pool;
         for(let i = 0; i < count; i++){
             let node = instantiate(prefab);
+            node.active = false;
             pool.put(node);
         }
     }

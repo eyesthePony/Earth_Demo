@@ -17,6 +17,8 @@ export class EventBus {
             if(!handlerList[i]){
                 handlerList[i] = objHandler;
                 return i;
+            }else if(handlerList[i].handler === objHandler.handler && handlerList[i].target === objHandler.target){
+                return i;
             }
         }
 
@@ -54,11 +56,13 @@ export class EventBus {
             return;
         }
 
-        for(let i = 0; i < handlerList.length; i++){
-            if(handlerList[i]){
-                handlerList[i].handler.apply(handlerList[i].target, args);
+        let list = handlerList.slice();
+        for (let i = 0; i < list.length; i++) {
+            if (list[i]) {
+                list[i].handler.apply(list[i].target, args);
             }
         }
+
     }
 
 
