@@ -32,6 +32,8 @@ export class BasePlane extends Component {
     protected fireBullet() {}
 
     update(deltaTime: number) {
+
+        
         // 无敌倒计时，基类统一处理
         if (this._invincibleTimer > 0) {
             this._invincibleTimer -= deltaTime;

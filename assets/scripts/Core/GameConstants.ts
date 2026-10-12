@@ -9,6 +9,7 @@ export class GameConstants {
         REMOVE_BULLET: "removeBullet",           // 从数组移除子弹
         PLAYER_BULLET_HIT: "playerBulletHit",    // 我方子弹击中
         ENEMY_BULLET_HIT: "enemyBulletHit",      // 敌方子弹击中
+        ENEMY_KILLED: "enemyKilled",
 
         // 游戏流程
         ON_GAME_START: "onGameStart",

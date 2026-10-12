@@ -1,0 +1,58 @@
+import { _decorator, Component, Node, Prefab, view, math } from 'cc';
+import { PoolManager } from '../../Core/PoolManager';
+import { EventBus } from '../../Core/EventBus';
+import { GameConstants } from '../../Core/GameConstants';
+const { ccclass, property } = _decorator;
+
+@ccclass('EnemyManager')
+export class EnemyManager extends Component {
+
+    @property(Prefab)
+    enemyPrefab: Prefab = null!;
+
+    @property({ tooltip: "生成间隔（秒）" })
+    spawnRate = 1;
+
+    private scrWidth = 0;
+    private topY = 0;
+    private spawnTimer = 0;
+
+    onLoad() {
+        const size = view.getVisibleSize();
+        this.scrWidth = size.width;
+        this.topY = size.height / 2;
+        EventBus.on(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.onEnemyRecycle, this);
+    }
+
+    // 用 update 手动计时，方便以后做“间隔逐渐缩短”等难度曲线
+    update(dt: number) {
+        this.spawnTimer += dt;
+        if (this.spawnTimer >= this.spawnRate) {
+            this.spawnTimer -= this.spawnRate;
+            this.spawnEnemy();
+        }
+    }
+
+    private onEnemyRecycle(enemyNode: Node) {
+        PoolManager.instance.putNode(enemyNode);
+    }
+
+    private spawnEnemy() {
+        if (!this.enemyPrefab) return;
+
+        const enemy = PoolManager.instance.getNode(this.enemyPrefab, this.node);
+
+        // 随机 X，范围在屏幕内缩一点
+        const halfW = 50;
+        const minX = -this.scrWidth / 2 + halfW;
+        const maxX = this.scrWidth / 2 - halfW;
+        const randomX = minX + Math.random() * (maxX - minX);
+
+        // 从屏幕顶外面生成
+        enemy.setPosition(randomX, this.topY + 100, 0);
+    }
+
+    onDestroy() {
+        EventBus.off(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.onEnemyRecycle, this);
+    }
+}
