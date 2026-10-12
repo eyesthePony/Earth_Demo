@@ -6,5 +6,32 @@
       "width": 720,
       "height": 1280
     }
+  },
+  "physics": {
+    "collisionGroups": [
+      {
+        "index": 1,
+        "name": "SELF_PLANE"
+      },
+      {
+        "index": 2,
+        "name": "ENEMY_PLANE"
+      },
+      {
+        "index": 3,
+        "name": "ENEMY_BUFFET"
+      },
+      {
+        "index": 4,
+        "name": "SELF_BUFFET"
+      }
+    ],
+    "collisionMatrix": {
+      "0": 0,
+      "1": 12,
+      "2": 18,
+      "3": 2,
+      "4": 4
+    }
   }
 }

@@ -62,7 +62,7 @@ export class PoolManager {
             pool = new NodePool();
             this._dictPool[name] = pool;
         }
-
+  
         node.active = false;
         pool.put(node);
     }

@@ -7,8 +7,7 @@ const { ccclass, property } = _decorator;
 
 @ccclass('EnemyPlane')
 export class EnemyPlane extends BasePlane {
-    @property(BulletManager)
-    bulletManager: BulletManager = null!;
+    
 
     private scrWidth = 0;
     private scrHeight = 0;
@@ -51,7 +50,7 @@ export class EnemyPlane extends BasePlane {
 
 
     shoot(){
-        this.bulletManager.spawnBullet(false, this.node.worldPosition, this._shootDir, 10, 500);
+        BulletManager.instance.spawnBullet(false, this.node.position, this._shootDir, 10, 500);
     }
 }
 

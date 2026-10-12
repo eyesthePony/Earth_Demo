@@ -8,6 +8,8 @@ const { ccclass, property } = _decorator;
 @ccclass('BulletManager')
 export class BulletManager extends Component {
 
+    static instance: BulletManager = null!;   
+
     @property(Prefab)
     playerBulletPrefab: Prefab = null;
 
@@ -17,7 +19,7 @@ export class BulletManager extends Component {
     
 
     onLoad() {
-        
+        BulletManager.instance = this; 
         EventBus.on(GameConstants.EVENT_TYPE.BULLET_KILLED, this.onBulletRecycle, this);
     
     }
@@ -40,7 +42,6 @@ export class BulletManager extends Component {
         const bulletComp = bulletNode.getComponent(BaseBullet);
         if (!bulletComp) return;
         // 放回对应池子
-
         PoolManager.instance.putNode(bulletNode);
 
     }

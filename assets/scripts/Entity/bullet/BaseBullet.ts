@@ -1,6 +1,6 @@
 import { EventBus } from '../../Core/EventBus';
 import { GameConstants } from '../../Core/GameConstants';
-import { _decorator, Collider2D, Component, Contact2DType, Vec3 } from 'cc';
+import { _decorator, Collider2D, Component, Contact2DType, Vec3, view } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('BaseBullet')
@@ -35,7 +35,7 @@ export class BaseBullet extends Component {
         this.damage = damage;
         this.speed = speed;
         this._direction.set(dir);
-        this.node.setWorldPosition(startPos);
+        this.node.setPosition(startPos);
         this._startPos.set(startPos);   // ← 在这里记，位置已经对
         this._isDead = false;
     }
@@ -49,8 +49,16 @@ export class BaseBullet extends Component {
             pos.z
         );
 
-        // 超出射程，通知回收
-        if (Vec3.distance(this._startPos, this.node.position) >= this.maxDistance) {
+        
+            // ========== 屏幕边界检测 飞出屏幕回收 ==========
+        const ws = view.getVisibleSize();
+        const w = ws.width / 2;
+        const h = ws.height / 2;
+        const margin = 300;   // ← 够大就行
+        // 移动后重新取
+        const cur = this.node.position;
+        if (cur.x < -w - margin || cur.x > w + margin
+        || cur.y < -h - margin || cur.y > h + margin) {
             this._isDead = true;
             EventBus.dispatchEvent(GameConstants.EVENT_TYPE.BULLET_KILLED, this.node);
         }
