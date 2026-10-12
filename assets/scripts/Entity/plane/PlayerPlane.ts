@@ -1,62 +1,92 @@
-import { _decorator, Component, Node, Vec3 } from 'cc';
+
+import { _decorator, Component, Node, view, EventTouch, UITransform, Vec3, Prefab, instantiate, director, PhysicsSystem2D, Collider2D } from 'cc';
 import { BasePlane } from './BasePlane';
-import { BulletManager } from '../bullet/BulletManager';
+import{BulletManager} from '../bullet/BulletManager';
 const { ccclass, property } = _decorator;
 
-@ccclass('PlayerPlane')
-export class PlayerPlane extends BasePlane {
-    @property(BulletManager)
-    bulletMgr: BulletManager = null!;
+@ccclass('player')
+export class player extends  BasePlane {
 
-    private _keyMap: Record<string, boolean> = {};
-    private _moveDir: Vec3 = new Vec3();
+    @property(BulletManager)
+    bulletManager: BulletManager = null!;
+
+    private scrWidth = 0;
+    private scrHeight = 0;
+    private halfW = 0;      // 飞机半宽
+    private halfH = 0;      // 飞机半高
+    private isSelected = false;
+    private _shootDir = new Vec3(0, 1, 0);
+
 
     onLoad() {
-        input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
-        input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
-    }
+        const size = view.getVisibleSize();
+        this.scrWidth = size.width;
+        this.scrHeight = size.height;
 
-    onKeyDown(e: EventKeyboard) {
-        this._keyMap[e.keyCode] = true;
-    }
-    onKeyUp(e: EventKeyboard) {
-        this._keyMap[e.keyCode] = false;
+        // 拿飞机自身的尺寸
+        const ut = this.getComponent(UITransform)!;
+        this.halfW = ut.width * ut.anchorX;         // 锚点左侧宽度
+        this.halfH = ut.height * ut.anchorY;        // 锚点下侧高度
+
+        // 注册触摸【补上！】
+        this.addTouchListeners();
+
     }
 
     update(deltaTime: number) {
-        // 先执行基类update（无敌、开火计时）
+        // 执行基类update：无敌计时、开火计时、死亡判断
         super.update(deltaTime);
 
-        // 玩家移动
-        this._moveDir.set(0,0,0);
-        if(this._keyMap[37]) this._moveDir.x -=1;
-        if(this._keyMap[39]) this._moveDir.x +=1;
-        if(this._keyMap[38]) this._moveDir.y +=1;
-        if(this._keyMap[40]) this._moveDir.y -=1;
-        this._moveDir.normalize();
-        this.node.translate(this._moveDir.multiplyScalar(this.moveSpeed * deltaTime));
-
-        // 空格发射子弹
-        if(this._keyMap[32] && this._fireTimer <= 0) {
-            this.fireBullet();
-            this._fireTimer = this.fireCd;
+        // CD冷却完毕发射子弹
+        if (this._fireTimer <= 0) {
+            this.shoot();
+            this._fireTimer += this.fireCd;
         }
     }
 
-    protected fireBullet() {
-        const pos = this.node.worldPosition;
-        this.bulletMgr.spawnBullet(true, pos, new Vec3(0,1,0), 10, 300);
-    }
 
-    protected onDeath() {
-        // 玩家死亡事件
-        director.getScene().emit(GameConstants.EVENT_TYPE.PLAYER_DEATH);
+    addTouchListeners(){
+        this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
+        this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
+        this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
+        this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
     }
 
     onDestroy() {
-        input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
-        input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
+        this.node.off(Node.EventType.TOUCH_START, this.onTouchStart, this);
+        this.node.off(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
+        this.node.off(Node.EventType.TOUCH_END, this.onTouchEnd, this);
+        this.node.off(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
+    }
+
+    private onTouchStart(e: EventTouch) {
+        this.isSelected = true;
+    }
+
+    private onTouchMove(e: EventTouch) {
+            if (!this.isSelected) return;
+
+        // 直接拿本次触摸相对上次的位移（UI 坐标）
+        const delta = e.getUIDelta();
+
+        const pos = this.node.position;
+        let newX = pos.x + delta.x;
+        let newY = pos.y + delta.y;
+
+        // 边界钳制
+        const maxX = this.scrWidth / 2 - this.halfW;
+        const maxY = this.scrHeight / 2 - this.halfH;
+        newX = Math.max(-maxX, Math.min(maxX, newX));
+        newY = Math.max(-maxY, Math.min(maxY, newY));
+
+        this.node.setPosition(newX, newY, pos.z);
+    }
+
+    private onTouchEnd() {
+        this.isSelected = false;
+    }
+
+    shoot(){
+        this.bulletManager.spawnBullet(true, this.node.worldPosition, this._shootDir, 10, 500);
     }
 }
-
-

@@ -7,7 +7,7 @@ export class BasePlane extends Component {
     @property
     hp: number = 100;
     @property
-    moveSpeed: number = 200;
+    moveSpeed: number = 100;
     @property
     fireCd: number = 0.2;
 

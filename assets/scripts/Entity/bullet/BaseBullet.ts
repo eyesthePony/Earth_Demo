@@ -29,17 +29,15 @@ export class BaseBullet extends Component {
         }
     }
 
-    onEnable() {
+    // 新增：显式初始化
+    public init(isPlayerBullet: boolean, dir: Vec3, damage: number, speed: number, startPos: Vec3) {
+        this.playerBullet = isPlayerBullet;
+        this.damage = damage;
+        this.speed = speed;
+        this._direction.set(dir);
+        this.node.setWorldPosition(startPos);
+        this._startPos.set(startPos);   // ← 在这里记，位置已经对
         this._isDead = false;
-        // 1. 记录起始位置
-        this._startPos.set(this.node.position);
-
-        // 2. 根据阵营设方向
-        if(this.playerBullet){
-            this._direction.set(0, 1, 0);
-        } else {
-            this._direction.set(0, -1, 0);
-        }
     }
 
     update(deltaTime: number) {
@@ -78,9 +76,7 @@ export class BaseBullet extends Component {
          EventBus.dispatchEvent(GameConstants.EVENT_TYPE.BULLET_KILLED, this.node);
     }
 
-    public setDirection(dir: Vec3) {
-        this._direction.set(dir);
-    }
+  
 
 
 }
