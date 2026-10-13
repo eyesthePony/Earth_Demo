@@ -11,6 +11,8 @@ export class BasePlane extends Component {
     @property
     fireCd: number = 0.2;
 
+    protected _isDead: boolean = false;
+
     protected _fireTimer: number = 0;
     protected _invincibleTimer: number = 0;
 

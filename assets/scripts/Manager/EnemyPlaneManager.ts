@@ -1,8 +1,8 @@
 import { _decorator, Component, Node, Prefab, view, math, Vec3 } from 'cc';
-import { PoolManager } from '../../Core/PoolManager';
-import { EventBus } from '../../Core/EventBus';
-import { GameConstants } from '../../Core/GameConstants';
-import { EnemyPlane } from './EnemyPlane';
+import { PoolManager } from '../Core/PoolManager';
+import { EventBus } from '../Core/EventBus';
+import { GameConstants } from '../Core/GameConstants';
+import { EnemyPlane } from '../Entity/plane/enemy/EnemyPlane';
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemyManager')
@@ -23,7 +23,7 @@ export class EnemyManager extends Component {
         this.scrWidth = size.width;
         this.topY = size.height / 2;
         EventBus.on(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.onEnemyRecycle, this);
-        EventBus.on(GameConstants.EVENT_TYPE.PLAYER_BULLET_HIT, this.onEnemyDamage, this);
+        EventBus.on(GameConstants.EVENT_TYPE.PLAYER_BULLET_HIT, this.onHit, this);
     }
 
     // 用 update 手动计时，方便以后做“间隔逐渐缩短”等难度曲线
@@ -39,7 +39,7 @@ export class EnemyManager extends Component {
         PoolManager.instance.putNode(enemyNode);
     }
 
-    private onEnemyDamage(enemyNode: Node, damage:number){
+    private onHit(enemyNode: Node, damage:number){
        const plane =  enemyNode.getComponent(EnemyPlane);
        plane.takeDamage(damage);
     }
@@ -62,6 +62,6 @@ export class EnemyManager extends Component {
 
     onDestroy() {
         EventBus.off(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.onEnemyRecycle, this);
-        EventBus.off(GameConstants.EVENT_TYPE.PLAYER_BULLET_HIT, this.onEnemyDamage, this);
+        EventBus.off(GameConstants.EVENT_TYPE.PLAYER_BULLET_HIT, this.onHit, this);
     }
 }

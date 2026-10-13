@@ -1,9 +1,9 @@
 
 import { _decorator, Component, Node, view, EventTouch, UITransform, Vec3, Prefab, instantiate, director, PhysicsSystem2D, Collider2D } from 'cc';
-import { BasePlane } from './BasePlane';
-import{BulletManager} from '../bullet/BulletManager';
-import { EventBus } from '../../Core/EventBus';
-import { GameConstants } from '../../Core/GameConstants';
+import { BasePlane } from '../BasePlane';
+import{BulletManager} from '../../../Manager/BulletManager';
+import { EventBus } from '../../../Core/EventBus';
+import { GameConstants } from '../../../Core/GameConstants';
 const { ccclass, property } = _decorator;
 
 @ccclass('player')
@@ -17,7 +17,7 @@ export class player extends  BasePlane {
     private halfH = 0;      // 飞机半高
     private isSelected = false;
     private _shootDir = new Vec3(0, 1, 0);
-    private _isDead: boolean = false;
+    
 
 
     onLoad() {
@@ -108,6 +108,7 @@ export class player extends  BasePlane {
     protected onDeath() {
         console.log('[Player] dead');
         this._isDead = true;  // 如果你加了 _isDead 字段的话，用来阻止 update 继续 shoot
+        EventBus.dispatchEvent(GameConstants.EVENT_TYPE.GAME_OVER);
         this.node.destroy(); 
     }
 }

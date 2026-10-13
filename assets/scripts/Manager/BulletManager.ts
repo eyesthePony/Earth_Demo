@@ -1,8 +1,8 @@
 import { _decorator, Component, instantiate, Node, Prefab, Vec3 } from 'cc';
-import { BaseBullet } from './BaseBullet';
-import{PoolManager} from '../../Core/PoolManager';
-import { EventBus } from '../../Core/EventBus';
-import { GameConstants } from '../../Core/GameConstants';
+import { BaseBullet } from '../Entity/bullet/BaseBullet';
+import{PoolManager} from '../Core/PoolManager';
+import { EventBus } from '../Core/EventBus';
+import { GameConstants } from '../Core/GameConstants';
 const { ccclass, property } = _decorator;
 
 @ccclass('BulletManager')

@@ -1,18 +1,18 @@
 import { _decorator, Component, Node, UITransform, Vec3, view } from 'cc';
-import { BasePlane } from './BasePlane';
-import { BulletManager } from '../bullet/BulletManager';
-import { EventBus } from '../../Core/EventBus';
-import { GameConstants } from '../../Core/GameConstants';
+import { BasePlane } from '../BasePlane';
+import { BulletManager } from '../../../Manager/BulletManager';
+import { EventBus } from '../../../Core/EventBus';
+import { GameConstants } from '../../../Core/GameConstants';
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemyPlane')
-export class EnemyPlane extends BasePlane {
+export class EnemyPlane extends BasePlane  {
     
     private scrHeight = 0;
     private halfH = 0;      // 飞机半高
     private bottomY = 0;
     private _shootDir = new Vec3(0, -1, 0);
-    private _isDead: boolean = false;  
+   
 
     onLoad() {
         const size = view.getVisibleSize();
@@ -31,6 +31,7 @@ export class EnemyPlane extends BasePlane {
         this.hp = 100;
         this._isDead = false;
         this._fireTimer = 0;  
+        this.fireCd = 1;
     }
 
     update(deltaTime: number) {
