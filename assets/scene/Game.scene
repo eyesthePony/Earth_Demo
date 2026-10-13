@@ -650,7 +650,7 @@
     "_enabled": true,
     "__prefab": null,
     "tag": 0,
-    "_group": 1,
+    "_group": 2,
     "_density": 1,
     "_sensor": true,
     "_friction": 0.2,
@@ -780,11 +780,11 @@
     "_enabled": true,
     "__prefab": null,
     "playerBulletPrefab": {
-      "__uuid__": "7edbfb30-4ec1-4bd2-b67a-b097f5db7743",
+      "__uuid__": "ba43409c-bfcd-42d0-bf1e-790cf18305af",
       "__expectedType__": "cc.Prefab"
     },
     "enemyBulletPrefab": {
-      "__uuid__": "7edbfb30-4ec1-4bd2-b67a-b097f5db7743",
+      "__uuid__": "42e478c7-94b0-48ca-b868-971d887afaa7",
       "__expectedType__": "cc.Prefab"
     },
     "_id": "32hgCFQZlO0KmrzJfiXc8M"

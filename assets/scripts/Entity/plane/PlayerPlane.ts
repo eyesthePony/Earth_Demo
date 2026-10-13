@@ -2,6 +2,8 @@
 import { _decorator, Component, Node, view, EventTouch, UITransform, Vec3, Prefab, instantiate, director, PhysicsSystem2D, Collider2D } from 'cc';
 import { BasePlane } from './BasePlane';
 import{BulletManager} from '../bullet/BulletManager';
+import { EventBus } from '../../Core/EventBus';
+import { GameConstants } from '../../Core/GameConstants';
 const { ccclass, property } = _decorator;
 
 @ccclass('player')
@@ -15,6 +17,7 @@ export class player extends  BasePlane {
     private halfH = 0;      // 飞机半高
     private isSelected = false;
     private _shootDir = new Vec3(0, 1, 0);
+    private _isDead: boolean = false;
 
 
     onLoad() {
@@ -30,9 +33,13 @@ export class player extends  BasePlane {
         // 注册触摸【补上！】
         this.addTouchListeners();
 
+        // PlayerPlane.onLoad
+        EventBus.on(GameConstants.EVENT_TYPE.ENEMY_BULLET_HIT, this.onHit, this);
+
     }
 
     update(deltaTime: number) {
+        if(this._isDead) return;
         // 执行基类update：无敌计时、开火计时、死亡判断
         super.update(deltaTime);
 
@@ -56,6 +63,8 @@ export class player extends  BasePlane {
         this.node.off(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
         this.node.off(Node.EventType.TOUCH_END, this.onTouchEnd, this);
         this.node.off(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
+        // PlayerPlane.onDestroy
+        EventBus.off(GameConstants.EVENT_TYPE.ENEMY_BULLET_HIT, this.onHit, this);
     }
 
     private onTouchStart(e: EventTouch) {
@@ -63,7 +72,7 @@ export class player extends  BasePlane {
     }
 
     private onTouchMove(e: EventTouch) {
-            if (!this.isSelected) return;
+        if (!this.isSelected) return;
 
         // 直接拿本次触摸相对上次的位移（UI 坐标）
         const delta = e.getUIDelta();
@@ -87,5 +96,18 @@ export class player extends  BasePlane {
 
     shoot(){
         BulletManager.instance.spawnBullet(true, this.node.position, this._shootDir, 10, 500);
+    }
+
+    onHit(playerNode: Node, damage:number){
+        // 事件里传的 otherCollider.node 就是玩家节点，判断一下是不是自己
+        if (playerNode !== this.node) return;
+        this.takeDamage(damage);
+    }
+
+       // 虚方法，子类重写
+    protected onDeath() {
+        console.log('[Player] dead');
+        this._isDead = true;  // 如果你加了 _isDead 字段的话，用来阻止 update 继续 shoot
+        this.node.destroy(); 
     }
 }

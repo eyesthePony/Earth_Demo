@@ -26,11 +26,12 @@ export class BulletManager extends Component {
 
     public spawnBullet(isPlayerBullet: boolean, spawnPos: Vec3, dir: Vec3, damage: number, speed: number): void {
         const prefab = isPlayerBullet ? this.playerBulletPrefab : this.enemyBulletPrefab;
-
+        
         // 从 PoolManager 取，没有就新建
         let bulletNode = PoolManager.instance.getNode(prefab, this.node);
 
         const bulletComp = bulletNode.getComponent(BaseBullet);
+        
         if (!bulletComp) return;
         // 一行搞定所有初始化
         bulletComp.init(isPlayerBullet, dir, damage, speed, spawnPos);

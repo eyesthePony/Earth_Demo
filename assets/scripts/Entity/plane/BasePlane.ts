@@ -17,7 +17,7 @@ export class BasePlane extends Component {
     // 对外受伤接口，GameManager调用
     takeDamage(damage: number) {
         if (this._invincibleTimer > 0) return;
-
+        if (this.hp <= 0) return; 
         this.hp -= damage;
         this._invincibleTimer = 1; // 默认1秒无敌，子类可以覆盖
 
@@ -29,11 +29,8 @@ export class BasePlane extends Component {
     // 虚方法，子类重写
     protected onDeath() {}
 
-    protected fireBullet() {}
 
     update(deltaTime: number) {
-
-        
         // 无敌倒计时，基类统一处理
         if (this._invincibleTimer > 0) {
             this._invincibleTimer -= deltaTime;

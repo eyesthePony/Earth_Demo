@@ -19,11 +19,11 @@
       },
       {
         "index": 3,
-        "name": "ENEMY_BUFFET"
+        "name": "ENEMY_BULLET"
       },
       {
         "index": 4,
-        "name": "SELF_BUFFET"
+        "name": "SELF_BULLET"
       }
     ],
     "collisionMatrix": {

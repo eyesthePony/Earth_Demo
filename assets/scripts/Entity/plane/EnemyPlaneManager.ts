@@ -1,7 +1,8 @@
-import { _decorator, Component, Node, Prefab, view, math } from 'cc';
+import { _decorator, Component, Node, Prefab, view, math, Vec3 } from 'cc';
 import { PoolManager } from '../../Core/PoolManager';
 import { EventBus } from '../../Core/EventBus';
 import { GameConstants } from '../../Core/GameConstants';
+import { EnemyPlane } from './EnemyPlane';
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemyManager')
@@ -22,6 +23,7 @@ export class EnemyManager extends Component {
         this.scrWidth = size.width;
         this.topY = size.height / 2;
         EventBus.on(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.onEnemyRecycle, this);
+        EventBus.on(GameConstants.EVENT_TYPE.PLAYER_BULLET_HIT, this.onEnemyDamage, this);
     }
 
     // 用 update 手动计时，方便以后做“间隔逐渐缩短”等难度曲线
@@ -37,22 +39,29 @@ export class EnemyManager extends Component {
         PoolManager.instance.putNode(enemyNode);
     }
 
+    private onEnemyDamage(enemyNode: Node, damage:number){
+       const plane =  enemyNode.getComponent(EnemyPlane);
+       plane.takeDamage(damage);
+    }
+
     private spawnEnemy() {
         if (!this.enemyPrefab) return;
 
-        const enemy = PoolManager.instance.getNode(this.enemyPrefab, this.node);
+       const enemy = PoolManager.instance.getNode(this.enemyPrefab, this.node);
+        const plane = enemy.getComponent(EnemyPlane);
 
         // 随机 X，范围在屏幕内缩一点
         const halfW = 50;
         const minX = -this.scrWidth / 2 + halfW;
         const maxX = this.scrWidth / 2 - halfW;
         const randomX = minX + Math.random() * (maxX - minX);
-
+        const position = new Vec3(randomX, this.topY + 100, 0);
         // 从屏幕顶外面生成
-        enemy.setPosition(randomX, this.topY + 100, 0);
+        plane.init(position);
     }
 
     onDestroy() {
         EventBus.off(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.onEnemyRecycle, this);
+        EventBus.off(GameConstants.EVENT_TYPE.PLAYER_BULLET_HIT, this.onEnemyDamage, this);
     }
 }

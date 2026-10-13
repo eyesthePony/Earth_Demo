@@ -27,10 +27,10 @@ export class GameConstants {
 
     // ========== 子弹阵营/分组 ==========
     public static ITEM_GROUP = {
-        ENEMY_BULLET: 2,     // 敌方子弹组
-        SELF_BULLET: 3,      // 我方子弹组
+        ENEMY_BULLET: 8,     // 敌方子弹组
+        SELF_BULLET: 16,      // 我方子弹组
         ENEMY_PLANE: 4,      // 敌机组
-        SELF_PLANE: 8,       // 我方机组
+        SELF_PLANE: 2,       // 我方机组
     };
 
     // ========== 子弹类型（用于BulletALL的switch） ==========

@@ -9,7 +9,7 @@ export class BaseBullet extends Component {
     public speed: number = 200;
 
     @property({ tooltip: "子弹伤害" })
-    public damage: number = 10;
+    public damage: number = 100;
 
     @property({ tooltip: "最大射程" })
     public maxDistance: number = 900;
@@ -71,6 +71,7 @@ export class BaseBullet extends Component {
                     && otherCollider.group === GameConstants.ITEM_GROUP.ENEMY_PLANE;
         const isEnemy = selfCollider.group === GameConstants.ITEM_GROUP.ENEMY_BULLET
                      && otherCollider.group === GameConstants.ITEM_GROUP.SELF_PLANE;
+                    
 
         if (!isSelf && !isEnemy) return;
         this._isDead = true;
