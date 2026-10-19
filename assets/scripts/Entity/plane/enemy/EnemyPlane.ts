@@ -4,6 +4,7 @@ import { BulletManager } from '../../../Manager/BulletManager';
 import { EventBus } from '../../../Core/EventBus';
 import { GameConstants } from '../../../Core/GameConstants';
 import { EffectManager } from '../../../Core/EffectManager';
+import { AudioManager } from '../../../Core/AudioManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemyPlane')
@@ -83,8 +84,10 @@ export class EnemyPlane extends BasePlane  {
         if(this._isDead) return;
         this._isDead = true;
         const pos = this.node.worldPosition.clone(); //获取当前世界坐标，避免节点回收后，坐标得不到。
-        EventBus.dispatchEvent(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.node);
         EffectManager.instance.play(GameConstants.EFFECT_TYPE.EXPLOSION, pos ,2);
+        AudioManager.instance.playOneShot(GameConstants.AUDIO_TYPE.BOOM,1);
+        EventBus.dispatchEvent(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.node);
+        
 
     }
 

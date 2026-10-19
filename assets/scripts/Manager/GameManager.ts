@@ -1,6 +1,7 @@
 import { _decorator, Component, director, Node } from 'cc';
 import { EventBus } from '../Core/EventBus';
 import { GameConstants } from '../Core/GameConstants';
+import { AudioManager } from '../Core/AudioManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameManager')
@@ -21,6 +22,10 @@ export class GameManager extends Component {
         EventBus.off(GameConstants.EVENT_TYPE.GAME_START, this.onGameRestart, this);
         EventBus.off(GameConstants.EVENT_TYPE.GAME_RESUME,this.onGameResume,this);
         EventBus.off(GameConstants.EVENT_TYPE.GAME_PAUSE,this.onGamePause,this);
+    }
+
+    protected start(): void {
+        AudioManager.instance.play(GameConstants.AUDIO_TYPE.BGM,1);
     }
 
     // 游戏结束

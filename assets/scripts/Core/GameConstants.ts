@@ -29,7 +29,13 @@ export class GameConstants {
 
     public static EFFECT_TYPE = {
         EXPLOSION: "explosion", //普通爆炸
-    }
+    };
+
+    public static AUDIO_TYPE = {
+        BGM:"bgm",
+        BOOM:"boom",
+        BULLET:"bullet",
+    };
 
     // ========== 子弹阵营/分组 ==========
     public static ITEM_GROUP = {
