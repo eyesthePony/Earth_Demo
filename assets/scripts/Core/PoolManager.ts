@@ -7,7 +7,7 @@ export class PoolManager {
     private _dictPool: any = {};
    
 
-    static _instance:PoolManager = null;
+    private static  _instance:PoolManager = null;
 
     static get instance():PoolManager{
         if(!this._instance){

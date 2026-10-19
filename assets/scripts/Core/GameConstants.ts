@@ -9,7 +9,11 @@ export class GameConstants {
         REMOVE_BULLET: "removeBullet",           // 从数组移除子弹
         PLAYER_BULLET_HIT: "playerBulletHit",    // 我方子弹击中
         ENEMY_BULLET_HIT: "enemyBulletHit",      // 敌方子弹击中
-        ENEMY_KILLED: "enemyKilled",
+        ENEMY_KILLED: "enemyKilled",             //飞机被玩家消灭死亡(加分)
+        ENEMY_ESCAPED: "enemyEscaped",  // 敌机飞出底部（不加分）
+        PLAYER_HP_CHANGED: "playerHpChanged" , // 玩家血变了 (curHp, maxHp)
+        PLAYER_DIED: "playerDied" ,       // 玩家死了（播特效用）  
+        SCORE_CHANGED: "scoreChanged" ,    // 分数变了 
 
         // 游戏流程 状态切换
         GAME_START: 'GAME_START',           // 开始游戏
@@ -21,8 +25,11 @@ export class GameConstants {
         GAME_QUIT: 'GAME_QUIT',             // 退出
         GAME_REVIVE: 'GAME_REVIVE',         // 复活
         GAME_SETTLE: 'GAME_SETTLE',         // 结算
-
     };
+
+    public static EFFECT_TYPE = {
+        EXPLOSION: "explosion", //普通爆炸
+    }
 
     // ========== 子弹阵营/分组 ==========
     public static ITEM_GROUP = {

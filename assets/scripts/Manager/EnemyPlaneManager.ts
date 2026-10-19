@@ -23,10 +23,12 @@ export class EnemyManager extends Component {
         this.scrWidth = size.width;
         this.topY = size.height / 2;
         EventBus.on(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.onEnemyRecycle, this);
+        EventBus.on(GameConstants.EVENT_TYPE.ENEMY_ESCAPED,this.onEnemyRecycle,this);
         EventBus.on(GameConstants.EVENT_TYPE.PLAYER_BULLET_HIT, this.onHit, this);
     }
+    
 
-    // 用 update 手动计时，方便以后做“间隔逐渐缩短”等难度曲线
+
     update(dt: number) {
         this.spawnTimer += dt;
         if (this.spawnTimer >= this.spawnRate) {
@@ -38,6 +40,8 @@ export class EnemyManager extends Component {
     private onEnemyRecycle(enemyNode: Node) {
         PoolManager.instance.putNode(enemyNode);
     }
+    
+   
 
     private onHit(enemyNode: Node, damage:number){
        const plane =  enemyNode.getComponent(EnemyPlane);
@@ -62,6 +66,7 @@ export class EnemyManager extends Component {
 
     onDestroy() {
         EventBus.off(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.onEnemyRecycle, this);
+        EventBus.off(GameConstants.EVENT_TYPE.ENEMY_ESCAPED,this.onEnemyRecycle,this);
         EventBus.off(GameConstants.EVENT_TYPE.PLAYER_BULLET_HIT, this.onHit, this);
     }
 }
