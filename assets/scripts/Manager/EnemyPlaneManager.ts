@@ -66,6 +66,7 @@ export class EnemyManager extends Component {
 
     private onHit(enemyNode: Node, damage:number){
        const plane =  enemyNode.getComponent(EnemyPlane);
+       if (!plane) return;
        plane.takeDamage(damage);
     }
 

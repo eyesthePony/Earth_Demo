@@ -72,7 +72,7 @@ export class EnemyPlane extends BasePlane  {
         BulletManager.instance.spawnBullet(false, this.node.position, this._shootDir, 10, 500);
     }
 
-    // 对外受伤接口，GameManager调用
+
     takeDamage(damage: number) {
         if (this.hp <= 0) return; 
         this.hp -= damage;

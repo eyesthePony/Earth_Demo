@@ -54,10 +54,8 @@ export class EffectManager extends Component {
         // ==========================================
         // 2. 播放动画
         // ==========================================
-        if (anim) {
-            anim.stop(); // 防复用残留状态
-            anim.play();
-        }
+        anim.stop(); // 防复用残留状态
+        anim.play();
 
         const waitTime = anim.defaultClip.duration;
 
@@ -66,7 +64,7 @@ export class EffectManager extends Component {
         // ==========================================
         // 假设动画时长 0.6 秒，用 scheduleOnce 延迟回收
          this.scheduleOnce(() => {
-            if (effectNode && effectNode.isValid) {
+            if (effectNode && effectNode.isValid && effectNode.active) {
                 PoolManager.instance.putNode(effectNode);
             }
         }, waitTime);

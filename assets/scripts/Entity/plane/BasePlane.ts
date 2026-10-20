@@ -16,6 +16,11 @@ export class BasePlane extends Component {
     protected _fireTimer: number = 0;
     protected _invincibleTimer: number = 0;
 
+    // 公开只读属性，外部可以查但改不了
+    public get isDead(): boolean {
+        return this._isDead;
+    }
+
     // 对外受伤接口，GameManager调用
     takeDamage(damage: number) {
         if (this._invincibleTimer > 0) return;

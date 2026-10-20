@@ -1,6 +1,7 @@
 import { EventBus } from '../../Core/EventBus';
 import { GameConstants } from '../../Core/GameConstants';
 import { _decorator, Collider2D, Component, Contact2DType, Vec3, view } from 'cc';
+import { BasePlane } from '../plane/BasePlane';
 const { ccclass, property } = _decorator;
 
 @ccclass('BaseBullet')
@@ -66,8 +67,10 @@ export class BaseBullet extends Component {
     }
 
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
+        //如果子弹以及碰撞过一次了，不再碰撞
         if(this._isDead) return;
         
+        //判断是否撞击敌方。没有就返回
         const isSelf = selfCollider.group === GameConstants.ITEM_GROUP.SELF_BULLET
                     && otherCollider.group === GameConstants.ITEM_GROUP.ENEMY_PLANE;
         const isEnemy = selfCollider.group === GameConstants.ITEM_GROUP.ENEMY_BULLET
@@ -75,6 +78,13 @@ export class BaseBullet extends Component {
                     
 
         if (!isSelf && !isEnemy) return;
+
+        //判断敌方是否已死，主要防止子弹射速太快，敌人被上个子弹打死还没回收，就被下一个子弹碰到
+        const target = otherCollider.getComponent(BasePlane);
+        if (target && target.isDead) {
+            return; // 对方已经死了，子弹穿过去
+        }
+
         this._isDead = true;
         // 1. 先发战斗事件（GameManager 用）
         if (isSelf) {

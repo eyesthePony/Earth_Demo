@@ -48,6 +48,7 @@ export class player extends  BasePlane {
         this._isDead = false;
         this._fireTimer = 0;
         this.hp = 100; // 恢复满血
+        this._invincibleTimer = 0
         
         // 4. 回到屏幕底部正中间
         const size = view.getVisibleSize();
