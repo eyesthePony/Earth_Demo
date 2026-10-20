@@ -33,10 +33,28 @@ export class player extends  BasePlane {
         // 注册触摸【补上！】
         this.addTouchListeners();
 
+        EventBus.on(GameConstants.EVENT_TYPE.GAME_RESET,this.onGameReset,this);
         EventBus.on(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED, this.onStateChanged, this);
         EventBus.on(GameConstants.EVENT_TYPE.ENEMY_BULLET_HIT, this.onHit, this);
 
     }
+
+    private onGameReset(){
+                // 1. 显示玩家节点
+        this.node.active = true;
+        
+        
+        // 3. 重置逻辑状态
+        this._isDead = false;
+        this._fireTimer = 0;
+        this.hp = 100; // 恢复满血
+        
+        // 4. 回到屏幕底部正中间
+        const size = view.getVisibleSize();
+        this.node.setPosition(0, -size.height / 2 + 150, 0);
+    }
+
+    
 
     update(deltaTime: number) {
         if(this._isDead) return;
@@ -78,11 +96,7 @@ export class player extends  BasePlane {
         this.node.off(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
     }
 
-    onDestroy() {
-        this.removeTouchListeners();
-        EventBus.off(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED, this.onStateChanged, this);
-        EventBus.off(GameConstants.EVENT_TYPE.ENEMY_BULLET_HIT, this.onHit, this);
-    }
+    
 
     private onTouchStart(e: EventTouch) {
         this.isSelected = true;
@@ -124,8 +138,16 @@ export class player extends  BasePlane {
        // 虚方法，子类重写
     protected onDeath() {
         console.log('[Player] dead');
-        this._isDead = true;  // 如果你加了 _isDead 字段的话，用来阻止 update 继续 shoot
+        this._isDead = true;  //  _isDead用来阻止 update 继续 shoot
+        this.node.active = false;
         EventBus.dispatchEvent(GameConstants.EVENT_TYPE.GAME_OVER);
-        this.node.destroy(); 
+    }
+
+
+    onDestroy() {
+        this.removeTouchListeners();
+        EventBus.off(GameConstants.EVENT_TYPE.GAME_RESET,this.onGameReset,this);
+        EventBus.off(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED, this.onStateChanged, this);
+        EventBus.off(GameConstants.EVENT_TYPE.ENEMY_BULLET_HIT, this.onHit, this);
     }
 }

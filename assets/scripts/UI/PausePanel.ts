@@ -11,11 +11,13 @@ export class PausePanel extends Component {
         this.node.active = false;  
         EventBus.on(GameConstants.EVENT_TYPE.GAME_PAUSE, this.show, this);
         EventBus.on(GameConstants.EVENT_TYPE.GAME_RESUME, this.hide, this);
+        EventBus.on(GameConstants.EVENT_TYPE.GAME_RESTART, this.hide, this);
     }
 
     onDestroy() {
         EventBus.off(GameConstants.EVENT_TYPE.GAME_PAUSE, this.show, this);
         EventBus.off(GameConstants.EVENT_TYPE.GAME_RESUME, this.hide, this);
+        EventBus.off(GameConstants.EVENT_TYPE.GAME_RESTART, this.hide, this);
     }
 
     private show() {

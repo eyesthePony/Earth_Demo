@@ -38,6 +38,7 @@ export class BaseBullet extends Component {
         this.node.setPosition(startPos);
         this._startPos.set(startPos);   // ← 在这里记，位置已经对
         this._isDead = false;
+        this.enabled = true; 
     }
 
     update(deltaTime: number) {

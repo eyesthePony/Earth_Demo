@@ -1,6 +1,7 @@
 import { _decorator, Component, Node, Prefab, Vec3,Animation} from 'cc';
-
 import { PoolManager } from './PoolManager';
+import { EventBus } from './EventBus';
+import { GameConstants } from './GameConstants';
 const { ccclass, property } = _decorator;
 
 @ccclass('EffectManager')
@@ -18,7 +19,16 @@ export class EffectManager extends Component {
         for (const p of this.effectPrefabs) {
             this._map.set(p.name, p);
         }
+
+        EventBus.on(GameConstants.EVENT_TYPE.GAME_RESET,this.onGameReset,this);
        
+    }
+
+    private onGameReset(){
+        const effects = this.node.children;
+        for (let i = effects.length - 1; i >= 0; i--) {
+            PoolManager.instance.putNode(effects[i]);
+        }
     }
 
 
@@ -61,6 +71,10 @@ export class EffectManager extends Component {
             }
         }, waitTime);
 
+    }
+
+    protected onDestroy(): void {
+        EventBus.off(GameConstants.EVENT_TYPE.GAME_RESET,this.onGameReset,this);
     }
 
 }

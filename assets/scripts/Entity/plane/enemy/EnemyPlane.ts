@@ -41,6 +41,7 @@ export class EnemyPlane extends BasePlane  {
         this._isDead = false;      //死亡判断重置
         this._fireTimer = 0;          //开火时间
         this.fireCd = 1;         //开火间隔
+        this.enabled = true; 
     }
 
     update(deltaTime: number) {

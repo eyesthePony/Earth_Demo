@@ -1,4 +1,6 @@
 import { _decorator, Component, Node, UITransform, view } from 'cc';
+import { EventBus } from './Core/EventBus';
+import { GameConstants } from './Core/GameConstants';
 const { ccclass, property } = _decorator;
 
 @ccclass('background')
@@ -28,6 +30,17 @@ export class background extends Component {
 
         this.bgs[0].setPosition(0, 0);
         this.bgs[1].setPosition(0, this.bgHeight);
+
+        EventBus.on(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this.onStateChanged,this);
+    }
+
+    onStateChanged(state:string){
+        const isPlaying = (state === GameConstants.GAME_STATE.PLAYING);
+        if (isPlaying) {
+            this.enabled = true;                 // 恢复 update（开火等逻辑）
+        } else {
+            this.enabled = false;                // 冻结 update
+        }
     }
 
     update(dt: number) {
@@ -42,5 +55,9 @@ export class background extends Component {
         }else if (this.bgs[1].position.y <= -this.bgHeight) {
             this.bgs[1].setPosition(pos2.x, this.bgs[0].position.y + this.bgHeight, pos2.z);
         }
+    }
+
+    protected onDestroy(): void {
+        EventBus.off(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this.onStateChanged,this);
     }
 }

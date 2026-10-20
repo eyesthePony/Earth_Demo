@@ -20,8 +20,16 @@ export class BulletManager extends Component {
 
     onLoad() {
         BulletManager.instance = this; 
+        EventBus.on(GameConstants.EVENT_TYPE.GAME_RESET,this.onGameReset,this);
         EventBus.on(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this.onStateChanged,this);
         EventBus.on(GameConstants.EVENT_TYPE.BULLET_KILLED, this.onBulletRecycle, this);
+    }
+
+    private onGameReset(){
+        const bullets = this.node.children;
+        for(let i = bullets.length - 1; i>=0 ;--i){
+            PoolManager.instance.putNode(bullets[i]);
+        }
     }
 
     onStateChanged(state:string){
@@ -73,6 +81,7 @@ export class BulletManager extends Component {
 
     onDestroy() {
         // EventBus是全局事件，不是节点组件事件，必须手动解绑！
+        EventBus.off(GameConstants.EVENT_TYPE.GAME_RESET,this.onGameReset,this);
         EventBus.off(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this.onStateChanged,this);
         EventBus.off(GameConstants.EVENT_TYPE.BULLET_KILLED, this.onBulletRecycle, this);
     }

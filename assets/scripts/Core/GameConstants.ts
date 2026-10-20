@@ -17,17 +17,19 @@ export class GameConstants {
 
         // 游戏流程 状态切换
         GAME_START: 'GAME_START',           // 开始游戏
-        GAME_PAUSE: 'GAME_PAUSE',           // 暂停
-        GAME_RESUME: 'GAME_RESUME',         // 继续
         GAME_OVER: 'GAME_OVER',             // 玩家死
+        GAME_RESTART:'GAME_RESTART',       //游戏重开
+        GAME_RESUME:'GAME_RESUME',         //游戏继续
+        GAME_PAUSE:'GAME_PAUSE',           //游戏暂停
         GAME_VICTORY: 'GAME_VICTORY',       // 胜利
-        GAME_RESTART: 'GAME_RESTART',       // 重开
+        GAME_RESET: 'GAME_RESET',          // 游戏重设，gamemanager收到GAME_RESTART后，发送重设消息给bulletmanager，enemiesmanaget，player
         GAME_QUIT: 'GAME_QUIT',             // 退出
         GAME_REVIVE: 'GAME_REVIVE',         // 复活
         GAME_SETTLE: 'GAME_SETTLE',         // 结算
         GAME_STATE_CHANGED:'GAME_STATE_CHANGED' //游戏状态切换了
     };
 
+    //gamemanager里的游戏状态变量，作为AME_STATE_CHANGED的参数传递给其他模块。
     public static GAME_STATE = {
          READY:'ready' ,
          PLAYING: 'playing' ,

@@ -30,38 +30,37 @@ export class GameManager extends Component {
         EventBus.off(GameConstants.EVENT_TYPE.GAME_PAUSE,this.onGamePause,this);
     }
 
-   
+    private onStateChanged(state:string){
+        if (this._state === state) return;
+        this._state = state;
+        EventBus.dispatchEvent(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this._state);
+    }
 
     private onGameStart(){
-        this._state = GameConstants.GAME_STATE.PLAYING;
-        EventBus.dispatchEvent(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this._state);
+        this.onStateChanged(GameConstants.GAME_STATE.PLAYING);
         AudioManager.instance.play(GameConstants.AUDIO_TYPE.BGM,1);
     }
 
     // 游戏结束
     private onGameOver() {
-        if (this._state === GameConstants.GAME_STATE.OVER) return;
-        this._state = GameConstants.GAME_STATE.OVER;
-        EventBus.dispatchEvent(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this._state);
+        this.onStateChanged(GameConstants.GAME_STATE.OVER);
         console.log('[GameManager] 游戏结束');
 
     }
 
     // 重开
     private onGameRestart() {
-        this._state = GameConstants.GAME_STATE.PLAYING;
-        EventBus.dispatchEvent(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this._state);
+        EventBus.dispatchEvent(GameConstants.EVENT_TYPE.GAME_RESET);
+        this.onStateChanged(GameConstants.GAME_STATE.PLAYING);
         console.log('[GameManager] 重新开始');
     }
 
     onGamePause(){
-        this._state = GameConstants.GAME_STATE.PAUSE;
-        EventBus.dispatchEvent(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this._state);
+        this.onStateChanged(GameConstants.GAME_STATE.PAUSE);
     }
 
     onGameResume(){
-        this._state = GameConstants.GAME_STATE.PLAYING;
-        EventBus.dispatchEvent(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this._state);
+        this.onStateChanged(GameConstants.GAME_STATE.PLAYING);
     }
 
 }
