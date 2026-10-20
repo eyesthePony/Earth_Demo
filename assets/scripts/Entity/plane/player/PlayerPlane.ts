@@ -33,7 +33,7 @@ export class player extends  BasePlane {
         // 注册触摸【补上！】
         this.addTouchListeners();
 
-        // PlayerPlane.onLoad
+        EventBus.on(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED, this.onStateChanged, this);
         EventBus.on(GameConstants.EVENT_TYPE.ENEMY_BULLET_HIT, this.onHit, this);
 
     }
@@ -50,6 +50,19 @@ export class player extends  BasePlane {
         }
     }
 
+    onStateChanged(state:string){
+        const isPlaying = (state === GameConstants.GAME_STATE.PLAYING);
+
+        if (isPlaying) {
+            this.enabled = true;                 // 恢复 update（开火等逻辑）
+            this.node.resumeSystemEvents(true);  // 恢复触摸响应
+        } else {
+            this.enabled = false;                // 冻结 update
+            this.isSelected = false;             // 强制松开触摸状态
+            this.node.pauseSystemEvents(true);   // 彻底屏蔽触摸，防止暂停时还能拖动飞机
+        }
+    }
+
 
     addTouchListeners(){
         this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
@@ -58,12 +71,16 @@ export class player extends  BasePlane {
         this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
     }
 
-    onDestroy() {
+    removeTouchListeners(){
         this.node.off(Node.EventType.TOUCH_START, this.onTouchStart, this);
         this.node.off(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
         this.node.off(Node.EventType.TOUCH_END, this.onTouchEnd, this);
         this.node.off(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
-        // PlayerPlane.onDestroy
+    }
+
+    onDestroy() {
+        this.removeTouchListeners();
+        EventBus.off(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED, this.onStateChanged, this);
         EventBus.off(GameConstants.EVENT_TYPE.ENEMY_BULLET_HIT, this.onHit, this);
     }
 

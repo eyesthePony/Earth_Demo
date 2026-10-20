@@ -6,7 +6,7 @@ const { ccclass, property } = _decorator;
 @ccclass('Resume')
 export class Resume extends Component {
     
-     onLoad() {
+    onLoad() {
         this.node.on(Button.EventType.CLICK, this.onClick, this);
     }
 

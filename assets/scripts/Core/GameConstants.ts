@@ -25,7 +25,22 @@ export class GameConstants {
         GAME_QUIT: 'GAME_QUIT',             // 退出
         GAME_REVIVE: 'GAME_REVIVE',         // 复活
         GAME_SETTLE: 'GAME_SETTLE',         // 结算
+        GAME_STATE_CHANGED:'GAME_STATE_CHANGED' //游戏状态切换了
     };
+
+    public static GAME_STATE = {
+         READY:'ready' ,
+         PLAYING: 'playing' ,
+         OVER:'over',
+         PAUSE:'pause',
+    }
+
+    public static GAME_SCENE = {
+        HALL: 'HallScene',
+        BATTLE: 'BattleScene'
+    }
+
+    
 
     public static EFFECT_TYPE = {
         EXPLOSION: "explosion", //普通爆炸

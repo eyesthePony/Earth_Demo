@@ -22,6 +22,7 @@ export class EnemyManager extends Component {
         const size = view.getVisibleSize();
         this.scrWidth = size.width;
         this.topY = size.height / 2;
+        EventBus.on(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this.onStateChanged,this);
         EventBus.on(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.onEnemyRecycle, this);
         EventBus.on(GameConstants.EVENT_TYPE.ENEMY_ESCAPED,this.onEnemyRecycle,this);
         EventBus.on(GameConstants.EVENT_TYPE.PLAYER_BULLET_HIT, this.onHit, this);
@@ -29,11 +30,25 @@ export class EnemyManager extends Component {
     
 
 
-    update(dt: number) {
-        this.spawnTimer += dt;
-        if (this.spawnTimer >= this.spawnRate) {
-            this.spawnTimer -= this.spawnRate;
-            this.spawnEnemy();
+    private onStateChanged(state:string){
+        // 游戏开始，启动定时器
+        if(state === GameConstants.GAME_STATE.PLAYING){
+            this.setEnemiesEabled(true);
+            this.schedule(this.spawnEnemy, this.spawnRate);
+        }else{//游戏暂停，关闭定时器。
+            this.setEnemiesEabled(false);
+            this.unschedule(this.spawnEnemy); 
+        }
+    }
+
+    private setEnemiesEabled(isEnabled:boolean){
+        const enemies = this.node.children;
+        const length = enemies.length;
+        for(let i=0;i<length;++i){
+            const enemy = enemies[i].getComponent(EnemyPlane);
+            if(enemy){
+                enemy.enabled = isEnabled;
+            }   
         }
     }
 
@@ -51,7 +66,7 @@ export class EnemyManager extends Component {
     private spawnEnemy() {
         if (!this.enemyPrefab) return;
 
-       const enemy = PoolManager.instance.getNode(this.enemyPrefab, this.node);
+        const enemy = PoolManager.instance.getNode(this.enemyPrefab, this.node);
         const plane = enemy.getComponent(EnemyPlane);
 
         // 随机 X，范围在屏幕内缩一点
@@ -65,6 +80,8 @@ export class EnemyManager extends Component {
     }
 
     onDestroy() {
+        this.unschedule(this.spawnEnemy);
+        EventBus.off(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this.onStateChanged,this);
         EventBus.off(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.onEnemyRecycle, this);
         EventBus.off(GameConstants.EVENT_TYPE.ENEMY_ESCAPED,this.onEnemyRecycle,this);
         EventBus.off(GameConstants.EVENT_TYPE.PLAYER_BULLET_HIT, this.onHit, this);

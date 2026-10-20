@@ -20,10 +20,32 @@ export class BulletManager extends Component {
 
     onLoad() {
         BulletManager.instance = this; 
+        EventBus.on(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this.onStateChanged,this);
         EventBus.on(GameConstants.EVENT_TYPE.BULLET_KILLED, this.onBulletRecycle, this);
-    
     }
 
+    onStateChanged(state:string){
+         // 游戏开始，启动定时器
+        if(state === GameConstants.GAME_STATE.PLAYING){
+            this.setBulletsEnabled(true);
+        }else{
+            this.setBulletsEnabled(false);
+        }
+    }
+
+    private setBulletsEnabled(isEnabled:boolean){
+        const bullets = this.node.children;
+        const length = bullets.length;
+        for(let i=length-1;i>=0;--i){
+            const bullet = bullets[i].getComponent(BaseBullet);
+            if(bullet){
+                bullet.enabled = isEnabled;
+            }
+        }
+
+    }
+
+    
     public spawnBullet(isPlayerBullet: boolean, spawnPos: Vec3, dir: Vec3, damage: number, speed: number): void {
         const prefab = isPlayerBullet ? this.playerBulletPrefab : this.enemyBulletPrefab;
         
@@ -51,6 +73,7 @@ export class BulletManager extends Component {
 
     onDestroy() {
         // EventBus是全局事件，不是节点组件事件，必须手动解绑！
+        EventBus.off(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this.onStateChanged,this);
         EventBus.off(GameConstants.EVENT_TYPE.BULLET_KILLED, this.onBulletRecycle, this);
     }
 
