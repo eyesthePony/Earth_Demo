@@ -1,4 +1,3 @@
-import { Vec3 } from "cc";
 
 export class GameConstants {
 

@@ -1,6 +1,4 @@
-import { _decorator, Component, instantiate, Node, NodePool, Prefab } from 'cc';
-const { ccclass, property } = _decorator;
-
+import { _decorator, instantiate, Node, NodePool, Prefab } from 'cc';
 
 export class PoolManager {
 

@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Prefab, view, math, Vec3 } from 'cc';
+import { _decorator, Component, Node, Prefab, view, Vec3 } from 'cc';
 import { PoolManager } from '../Core/PoolManager';
 import { EventBus } from '../Core/EventBus';
 import { GameConstants } from '../Core/GameConstants';
@@ -8,6 +8,8 @@ const { ccclass, property } = _decorator;
 @ccclass('EnemyManager')
 export class EnemyManager extends Component {
 
+    private static _instance:EnemyManager = null;
+
     @property(Prefab)
     enemyPrefab: Prefab = null!;
 
@@ -16,9 +18,10 @@ export class EnemyManager extends Component {
 
     private scrWidth = 0;
     private topY = 0;
-    private spawnTimer = 0;
+   
 
     onLoad() {
+        EnemyManager._instance = this;
         const size = view.getVisibleSize();
         this.scrWidth = size.width;
         this.topY = size.height / 2;
@@ -27,6 +30,13 @@ export class EnemyManager extends Component {
         EventBus.on(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.onEnemyRecycle, this);
         EventBus.on(GameConstants.EVENT_TYPE.ENEMY_ESCAPED,this.onEnemyRecycle,this);
         EventBus.on(GameConstants.EVENT_TYPE.PLAYER_BULLET_HIT, this.onHit, this);
+    }
+
+    static get instance():EnemyManager{
+        if(!this._instance){
+            this._instance = new EnemyManager();
+        }
+        return this._instance;
     }
 
     private onGameReset(){
@@ -38,10 +48,8 @@ export class EnemyManager extends Component {
 
     private onStateChanged(state:string){
         // 游戏开始，启动定时器
-        this.unschedule(this.spawnEnemy);
         if(state === GameConstants.GAME_STATE.PLAYING){
             this.setEnemiesEabled(true);
-            this.schedule(this.spawnEnemy, this.spawnRate);
         }else{//游戏暂停，关闭定时器。
             this.setEnemiesEabled(false);
         }
@@ -70,7 +78,7 @@ export class EnemyManager extends Component {
        plane.takeDamage(damage);
     }
 
-    private spawnEnemy() {
+    public spawnEnemy() {
         if (!this.enemyPrefab) return;
 
         const enemy = PoolManager.instance.getNode(this.enemyPrefab, this.node);

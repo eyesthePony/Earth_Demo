@@ -1,7 +1,7 @@
-import { _decorator, Component, Node, director } from 'cc';
+import { _decorator, Component } from 'cc';
 import { EventBus } from '../Core/EventBus';
 import { GameConstants } from '../Core/GameConstants';
-const { ccclass, property } = _decorator;
+const { ccclass} = _decorator;
 
 @ccclass('PausePanel')
 export class PausePanel extends Component {

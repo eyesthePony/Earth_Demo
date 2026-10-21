@@ -1,10 +1,10 @@
 
-import { _decorator, Component, Node, view, EventTouch, UITransform, Vec3, Prefab, instantiate, director, PhysicsSystem2D, Collider2D } from 'cc';
+import { _decorator, Node, view, EventTouch, UITransform, Vec3 } from 'cc';
 import { BasePlane } from '../BasePlane';
 import{BulletManager} from '../../../Manager/BulletManager';
 import { EventBus } from '../../../Core/EventBus';
 import { GameConstants } from '../../../Core/GameConstants';
-const { ccclass, property } = _decorator;
+const { ccclass} = _decorator;
 
 @ccclass('player')
 export class player extends  BasePlane {

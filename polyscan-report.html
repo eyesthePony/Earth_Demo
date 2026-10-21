@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>polyscan Analysis Report · scripts</title>
+<style>/* jscan unified report styles. Self-contained: no external fonts or scripts. */
+:root {
+  color-scheme: light;
+  --page: #f3f5f8;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --ink: #0f172a;
+  --ink-2: #475569;
+  --muted: #7c8797;
+  --line: #e3e8ef;
+  --line-2: #cbd3de;
+  --accent: #3178c6;
+  --accent-ink: #245a96;
+  --violet: #7c3aed;
+  --teal: #0f766e;
+  --good: #15803d;
+  --good-soft: #e3f4e8;
+  --warn: #b45309;
+  --warn-soft: #fdf0dc;
+  --bad: #b91c1c;
+  --bad-soft: #fde8e8;
+  --info-soft: #e6eefc;
+  --track: #e6eaf0;
+  --shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 1px 1px rgba(15, 23, 42, .03);
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0e1218;
+    --surface: #161c25;
+    --surface-2: #1c232e;
+    --ink: #e8edf4;
+    --ink-2: #b1bccb;
+    --muted: #7f8ca0;
+    --line: #263040;
+    --line-2: #344255;
+    --accent: #6aa5e0;
+    --accent-ink: #8fc0ef;
+    --violet: #a78bfa;
+    --teal: #2dd4bf;
+    --good: #4ade80;
+    --good-soft: #14301f;
+    --warn: #fbbf24;
+    --warn-soft: #3a2a0c;
+    --bad: #f87171;
+    --bad-soft: #3d1717;
+    --info-soft: #1b2a45;
+    --track: #263040;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0e1218;
+  --surface: #161c25;
+  --surface-2: #1c232e;
+  --ink: #e8edf4;
+  --ink-2: #b1bccb;
+  --muted: #7f8ca0;
+  --line: #263040;
+  --line-2: #344255;
+  --accent: #6aa5e0;
+  --accent-ink: #8fc0ef;
+  --violet: #a78bfa;
+  --teal: #2dd4bf;
+  --good: #4ade80;
+  --good-soft: #14301f;
+  --warn: #fbbf24;
+  --warn-soft: #3a2a0c;
+  --bad: #f87171;
+  --bad-soft: #3d1717;
+  --info-soft: #1b2a45;
+  --track: #263040;
+  --shadow: none;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+h1, h2, h3 { margin: 0; font-weight: 650; letter-spacing: -.01em; }
+h3 { font-size: 14px; margin: 22px 0 10px; }
+.num { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--mono); font-size: 12.5px; }
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.wrap { white-space: normal !important; word-break: break-word; }
+.good { color: var(--good); }
+.warn { color: var(--warn); }
+.bad  { color: var(--bad); }
+
+/* ---------- top bar ---------- */
+.topbar { background: var(--surface); border-bottom: 1px solid var(--line); }
+.topbar-inner {
+  max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-weight: 700; font-size: 18px; letter-spacing: -.01em; }
+.brand svg { width: 26px; height: 26px; }
+.brand .ver { font-weight: 400; font-size: 12px; color: var(--muted); margin-left: 2px; }
+.project { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.project .name { font-weight: 600; font-size: 15px; }
+.project .path { color: var(--muted); font-family: var(--mono); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 420px; }
+.meta { margin-left: auto; color: var(--muted); font-size: 12px; display: flex; gap: 14px; }
+
+/* ---------- tabs ---------- */
+.tabs { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
+.tabs-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; gap: 4px; overflow-x: auto; }
+.tab {
+  appearance: none; background: none; border: 0; border-bottom: 2px solid transparent;
+  padding: 12px 14px; font: inherit; font-weight: 500; color: var(--ink-2); cursor: pointer; white-space: nowrap;
+  display: flex; align-items: center; gap: 8px;
+}
+.tab:hover { color: var(--ink); }
+.tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
+.tab.active { color: var(--accent-ink); border-bottom-color: var(--accent); }
+.tab .count {
+  font-family: var(--mono); font-size: 11px; padding: 1px 6px; border-radius: 999px;
+  background: var(--surface-2); color: var(--muted); border: 1px solid var(--line);
+}
+.tab .count.bad { background: var(--bad-soft); color: var(--bad); border-color: transparent; }
+.tab .count.warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+
+main { max-width: 1200px; margin: 0 auto; padding: 24px 24px 40px; }
+.panel { display: none; }
+.panel.active { display: block; }
+.panel-h { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.panel-h h2 { font-size: 20px; }
+.scores { display: flex; gap: 8px; flex-wrap: wrap; }
+.score-pill { font-size: 12.5px; padding: 4px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--ink-2); }
+.score-pill b { font-weight: 700; margin-left: 2px; }
+.score-pill.ok b { color: var(--good); }
+.score-pill.watch b { color: var(--warn); }
+.score-pill.poor b { color: var(--bad); }
+
+/* ---------- verdict ---------- */
+.verdict {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
+  padding: 24px 28px; display: grid; grid-template-columns: auto 1fr auto; gap: 28px; align-items: center;
+}
+.ring { position: relative; width: 132px; height: 132px; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .track { stroke: var(--track); }
+.ring .fill { stroke: var(--good); stroke-linecap: round; }
+.ring.band-watch .fill { stroke: var(--warn); }
+.ring.band-poor .fill { stroke: var(--bad); }
+.ring .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
+.ring .score { font-size: 42px; font-weight: 700; letter-spacing: -.03em; }
+.ring .of { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.verdict h1 { margin: 0 0 6px; font-size: 22px; text-wrap: balance; display: flex; align-items: center; gap: 12px; }
+.grade {
+  display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; flex: none;
+  font-family: var(--mono); font-weight: 700; font-size: 18px; background: var(--good-soft); color: var(--good);
+}
+.grade.band-watch { background: var(--warn-soft); color: var(--warn); }
+.grade.band-poor { background: var(--bad-soft); color: var(--bad); }
+.verdict p { margin: 0; color: var(--ink-2); max-width: 62ch; }
+.verdict p strong { color: var(--ink); font-weight: 600; }
+.verdict .scale { margin-top: 6px; font-size: 12px; color: var(--muted); }
+.facts { display: grid; grid-template-columns: repeat(2, auto); gap: 6px 28px; text-align: right; }
+.fact .v { font-size: 20px; font-weight: 650; letter-spacing: -.02em; }
+.fact .l { font-size: 11.5px; color: var(--muted); }
+
+/* ---------- layout ---------- */
+.grid { display: grid; gap: 20px; margin-top: 20px; }
+.grid.two { grid-template-columns: 7fr 5fr; }
+.grid.three { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.col > .card:last-child { flex: 1; }
+@media (max-width: 900px) {
+  .grid.two { grid-template-columns: 1fr; }
+  .col > .card:last-child { flex: none; }
+  .verdict { grid-template-columns: 1fr; }
+  .facts { text-align: left; }
+}
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
+  padding: 18px 20px; min-width: 0;
+}
+.panel > .card, .panel > details.card { margin-bottom: 20px; }
+.card-h { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; gap: 12px; }
+.card-h h2 { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); }
+.card-h a { font-size: 12.5px; color: var(--accent-ink); text-decoration: none; }
+.card-h a:hover { text-decoration: underline; }
+.note { margin: 12px 0 0; }
+.ok-msg { color: var(--good); font-weight: 600; margin: 8px 0 0; }
+.callout { margin-top: 14px; padding: 12px 14px; border-radius: 8px; font-size: 13px; }
+.callout.warn { background: var(--warn-soft); color: var(--ink); }
+.callout.info { background: var(--info-soft); color: var(--ink); }
+.callout ul { margin: 6px 0 0; padding-left: 20px; }
+details.card > summary { cursor: pointer; list-style: none; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+details.card > summary::-webkit-details-marker { display: none; }
+details.card > summary h2 { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); }
+details.card > summary h2::before { content: "▸ "; color: var(--muted); }
+details.card[open] > summary h2::before { content: "▾ "; }
+details.card[open] > summary { margin-bottom: 14px; }
+
+/* ---------- dimension cards ---------- */
+.dims { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.dim {
+  display: block; text-decoration: none; color: inherit;
+  border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--surface);
+  transition: border-color .15s, background .15s;
+}
+.dim:hover { border-color: var(--line-2); background: var(--surface-2); }
+.dim.static:hover { border-color: var(--line); background: var(--surface); }
+.dim:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dim-top { display: flex; justify-content: space-between; align-items: baseline; }
+.dim-name { font-weight: 600; font-size: 13.5px; }
+.dim-score { font-weight: 650; font-size: 15px; letter-spacing: -.01em; }
+.dim-score small { font-weight: 400; color: var(--muted); font-size: 11px; }
+.bar { height: 5px; background: var(--track); border-radius: 3px; margin: 8px 0 7px; overflow: hidden; }
+.bar > i { display: block; height: 100%; border-radius: 3px; background: var(--good); }
+.dim.ok .dim-score { color: var(--good); }
+.dim.watch .bar > i { background: var(--warn); } .dim.watch .dim-score { color: var(--warn); }
+.dim.poor .bar > i { background: var(--bad); }  .dim.poor .dim-score { color: var(--bad); }
+.dim-top, .dim-sub { flex-wrap: wrap; }
+.dim-sub { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+/* Two score cards no longer fit side by side on a phone: the name and the
+   score start to overlap well before the card itself runs out of room. */
+@media (max-width: 560px) {
+  .dims { grid-template-columns: 1fr; }
+}
+
+/* ---------- tables ---------- */
+.tbl-wrap { overflow-x: auto; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tbl th { text-align: left; font-weight: 500; font-size: 11.5px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); padding: 0 10px 8px 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.tbl th.r, .tbl td.r { text-align: right; }
+.tbl td { padding: 8px 10px 8px 0; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
+.tbl td.grow { width: 100%; max-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.tbl td:last-child, .tbl th:last-child { padding-right: 0; }
+.tbl tbody tr:last-child td { border-bottom: 0; }
+.tbl tbody tr:hover td { background: var(--surface-2); }
+.tbl.compact td { padding-top: 5px; padding-bottom: 5px; }
+.tbl tr.preview-row td { white-space: normal; padding-top: 0; }
+.tbl tr.preview-row:hover td { background: transparent; }
+.tbl .path { font-family: var(--mono); font-size: 12.5px; display: flex; min-width: 0; }
+.tbl .path span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.tbl .path b { flex: none; font-weight: 600; color: var(--ink); }
+.table-sort { appearance: none; background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; letter-spacing: inherit; text-transform: inherit; }
+.table-sort:hover { color: var(--ink); }
+th[aria-sort="ascending"] .table-sort::after { content: " ↑"; }
+th[aria-sort="descending"] .table-sort::after { content: " ↓"; }
+.cc { display: inline-flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.cc .mini { width: 48px; height: 5px; background: var(--track); border-radius: 3px; overflow: hidden; }
+.cc .mini > i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.cc.bad .mini > i { background: var(--bad); }
+.cc.warn .mini > i { background: var(--warn); }
+.pill { display: inline-block; min-width: 22px; text-align: center; font-family: var(--mono); font-size: 12px; padding: 1px 6px; border-radius: 6px; background: var(--surface-2); color: var(--muted); }
+.pill.bad, .pill.risk-high, .pill.sev-critical, .pill.sev-error { background: var(--bad-soft); color: var(--bad); }
+.pill.warn, .pill.risk-medium, .pill.sev-warning, .pill.sev-high, .pill.sev-medium { background: var(--warn-soft); color: var(--warn); }
+.pill.good, .pill.risk-low { background: var(--good-soft); color: var(--good); }
+.pill.sev-info, .pill.sev-low { background: var(--info-soft); color: var(--accent-ink); }
+.pill.type { color: var(--ink); }
+.pill.t1 { background: var(--good-soft); color: var(--good); }
+.pill.t2 { background: color-mix(in srgb, var(--violet) 15%, transparent); color: var(--violet); }
+.pill.t3 { background: var(--info-soft); color: var(--accent-ink); }
+.pill.t4 { background: color-mix(in srgb, var(--teal) 15%, transparent); color: var(--teal); }
+
+/* ---------- charts ---------- */
+.chart { width: 100%; max-width: 520px; height: auto; display: block; overflow: visible; }
+.chart text { font-family: var(--sans); fill: var(--muted); font-size: 11px; }
+.chart .lbl { fill: var(--ink-2); font-weight: 600; font-size: 11.5px; }
+.chart .lbl.warn { fill: var(--warn); }
+.chart .lbl.bad { fill: var(--bad); }
+.chart .grid line { stroke: var(--line); }
+.chart .b { fill: var(--accent); }
+.chart .b:hover { fill: var(--accent-ink); }
+.chart .b.warn { fill: var(--warn); }
+.chart .b.bad { fill: var(--bad); }
+.chart .thresh { stroke: var(--bad); stroke-dasharray: 3 3; }
+.chart .thresh-t { fill: var(--bad); font-weight: 600; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); margin-top: 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.stack { display: flex; height: 10px; border-radius: 5px; overflow: hidden; gap: 2px; background: var(--track); margin-top: 10px; }
+.stack > i { display: block; height: 100%; }
+.t1 { background: var(--good); }
+.t2 { background: var(--violet); }
+.t3 { background: var(--accent); }
+.t4 { background: var(--teal); }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; font-size: 13px; margin: 12px 0 0; }
+.kv dt { color: var(--ink-2); margin: 0; white-space: nowrap; }
+.kv dd { margin: 0; text-align: right; font-weight: 600; min-width: 0; }
+.kv dd.mono { font-weight: 500; font-size: 12px; white-space: nowrap; }
+.big { font-size: 30px; font-weight: 700; letter-spacing: -.02em; line-height: 1; }
+.big small { font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: 0; margin-left: 4px; }
+
+/* ---------- metric strip (detail tabs) ---------- */
+.strip { display: flex; flex-wrap: wrap; gap: 8px 0; margin-bottom: 6px; }
+.strip .s { padding: 4px 20px; border-left: 1px solid var(--line); min-width: 120px; }
+.strip .s:first-child { padding-left: 0; border-left: 0; }
+.strip .v { font-size: 22px; font-weight: 650; letter-spacing: -.02em; line-height: 1.1; }
+.strip .v small { font-size: 13px; font-weight: 500; color: var(--muted); }
+.strip .l { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+/* ---------- clone groups & previews ---------- */
+.clone-group { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; background: var(--surface-2); }
+.clone-group-h { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+.code-preview-card { margin: 4px 0 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); overflow: hidden; }
+.code-preview-title { font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); padding: 6px 10px; border-bottom: 1px solid var(--line); }
+.code-preview { margin: 0; padding: 10px; font-family: var(--mono); font-size: 12px; line-height: 1.5; overflow-x: auto; color: var(--ink); }
+
+footer { max-width: 1200px; margin: 0 auto; padding: 0 24px 40px; color: var(--muted); font-size: 12px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+footer a { color: var(--ink-2); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M7 9C7 7.34315 8.34315 6 10 6H14C15.6569 6 17 7.34315 17 9V13C17 14.6569 15.6569 16 14 16H10C8.34315 16 7 17.3431 7 19V20" stroke="#3178c6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="17" cy="19" r="2" fill="#f7df1e"/>
+      </svg>
+      polyscan <span class="ver">0.6.0</span>
+    </div>
+    
+    <div class="project">
+      <span class="name">scripts</span>
+      <span class="path" title="D:\cocosEdit\Creator\Earth_Demo\assets\scripts">D:\cocosEdit\Creator\Earth_Demo\assets\scripts</span>
+    </div>
+    
+    <div class="meta">
+      <span>2026-10-21 20:00</span>
+      <span>25 files in 2147ms</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Report sections">
+  <div class="tabs-inner" role="tablist">
+    
+    <button class="tab active" role="tab" data-tab="overview">Overview</button>
+    
+    <button class="tab" role="tab" data-tab="functions">Functions <span class="count warn">16</span></button>
+    
+    <button class="tab" role="tab" data-tab="duplication">Duplication <span class="count warn">4</span></button>
+    
+    <button class="tab" role="tab" data-tab="classes">Classes</button>
+    
+    <button class="tab" role="tab" data-tab="architecture">Architecture</button>
+    
+  </div>
+</nav>
+
+<main>
+
+
+<section id="overview" class="panel active">
+
+  <div class="verdict">
+    <div class="ring band-ok" role="img" aria-label="Health score 89 out of 100">
+      <svg viewBox="0 0 132 132">
+        <circle class="track" cx="66" cy="66" r="56" fill="none" stroke-width="10"/>
+        <circle class="fill" cx="66" cy="66" r="56" fill="none" stroke-width="10" stroke-dasharray="351.86" stroke-dashoffset="38.7"/>
+      </svg>
+      <div class="center">
+        <div class="score num">89</div>
+        <div class="of">HEALTH SCORE</div>
+      </div>
+    </div>
+    <div>
+      <h1><span class="grade band-ok">B</span> Good shape overall</h1>
+      <p>Complexity, dead code, coupling, and dependencies are clean. Most of the remaining debt is in <strong>duplication</strong> (23.1% of fragments, 4 groups).</p>
+      <p class="scale">Project scale: Small (25 files, 113 functions, 1511 LOC)</p>
+    </div>
+    <div class="facts">
+      <div class="fact"><div class="v num">1,511</div><div class="l">lines</div></div><div class="fact"><div class="v num">25</div><div class="l">files</div></div><div class="fact"><div class="v num">113</div><div class="l">functions</div></div><div class="fact"><div class="v num">25</div><div class="l">classes</div></div>
+    </div>
+  </div>
+
+  <div class="grid two">
+    <div class="col">
+      
+      <div class="card">
+        <div class="card-h"><h2>Score breakdown</h2><span class="muted small">weighted into the health score</span></div>
+        <div class="dims">
+          
+          <a class="dim ok" href="#functions" data-goto="functions">
+            <div class="dim-top"><span class="dim-name">Complexity</span><span class="dim-score num">100<small>/100</small></span></div>
+            <div class="bar"><i style="width:100%"></i></div>
+            <div class="dim-sub"><span>avg CC 1.73</span><span>0 high-risk</span></div>
+          </a>
+          
+          <a class="dim ok" href="#functions" data-goto="functions">
+            <div class="dim-top"><span class="dim-name">Dead code</span><span class="dim-score num">90<small>/100</small></span></div>
+            <div class="bar"><i style="width:90%"></i></div>
+            <div class="dim-sub"><span>16 findings</span><span>0 critical</span></div>
+          </a>
+          
+          <a class="dim watch" href="#duplication" data-goto="duplication">
+            <div class="dim-top"><span class="dim-name">Duplication</span><span class="dim-score num">60<small>/100</small></span></div>
+            <div class="bar"><i style="width:60%"></i></div>
+            <div class="dim-sub"><span>23.1% of fragments</span><span>4 groups</span></div>
+          </a>
+          
+          <a class="dim ok" href="#classes" data-goto="classes">
+            <div class="dim-top"><span class="dim-name">Coupling</span><span class="dim-score num">100<small>/100</small></span></div>
+            <div class="bar"><i style="width:100%"></i></div>
+            <div class="dim-sub"><span>avg CBO 2.0</span><span>0 of 25 high</span></div>
+          </a>
+          
+          <a class="dim ok" href="#architecture" data-goto="architecture">
+            <div class="dim-top"><span class="dim-name">Dependencies</span><span class="dim-score num">95<small>/100</small></span></div>
+            <div class="bar"><i style="width:95%"></i></div>
+            <div class="dim-sub"><span>no cycles</span><span>depth 5</span></div>
+          </a>
+          
+        </div>
+      </div>
+      
+    </div>
+
+    <div class="col">
+      
+      <div class="card">
+        <div class="card-h"><h2>Complexity distribution</h2><span class="muted small">113 functions</span></div>
+        <svg class="chart" viewBox="0 0 420 190" role="img" aria-label="Histogram of cyclomatic complexity">
+          <g class="grid"><line x1="44" y1="150" x2="412" y2="150"/><line x1="44" y1="110.4" x2="412" y2="110.4"/><line x1="44" y1="70.8" x2="412" y2="70.8"/><line x1="44" y1="30" x2="412" y2="30"/></g>
+          <text x="38" y="153.5" text-anchor="end">0</text><text x="38" y="113.9" text-anchor="end">33</text><text x="38" y="74.3" text-anchor="end">66</text><text x="38" y="33.5" text-anchor="end">100</text>
+          <rect class="b " x="54.3" y="70.8" width="53" height="79.2" rx="3"><title>CC 1: 66 functions</title></rect><rect class="b " x="127.9" y="97.2" width="53" height="52.8" rx="3"><title>CC 2–5: 44 functions</title></rect><rect class="b " x="201.5" y="146.4" width="53" height="3.6" rx="3"><title>CC 6–9: 3 functions</title></rect><rect class="b warn" x="275.1" y="150" width="53" height="0" rx="3"><title>CC 10–19: 0 functions</title></rect><rect class="b bad" x="348.7" y="150" width="53" height="0" rx="3"><title>CC 20&#43;: 0 functions</title></rect>
+          <text class="lbl " x="80.8" y="64.8" text-anchor="middle">66</text><text class="lbl " x="154.4" y="91.2" text-anchor="middle">44</text><text class="lbl " x="228.0" y="140.4" text-anchor="middle">3</text><text class="lbl warn" x="301.6" y="144.0" text-anchor="middle">0</text><text class="lbl bad" x="375.2" y="144.0" text-anchor="middle">0</text>
+          <line class="thresh" x1="261.8" y1="18" x2="261.8" y2="150"/><text class="thresh-t" x="265.8" y="14">risk from CC 10</text>
+          <text x="80.8" y="170" text-anchor="middle">1</text><text x="154.4" y="170" text-anchor="middle">2–5</text><text x="228.0" y="170" text-anchor="middle">6–9</text><text x="301.6" y="170" text-anchor="middle">10–19</text><text x="375.2" y="170" text-anchor="middle">20&#43;</text>
+          <text x="228" y="186" text-anchor="middle">cyclomatic complexity</text>
+        </svg>
+        <dl class="kv"><dt>Median complexity</dt><dd class="num ">CC 1</dd><dt>Deepest nesting</dt><dd class="num ">2 levels (off)</dd><dt>Longest function</dt><dd class="num ">38 lines (play)</dd></dl>
+      </div>
+      
+    </div>
+  </div>
+
+  
+  <div class="card" style="margin-top:20px">
+    <div class="card-h"><h2>Hotspot files</h2><a href="#functions" data-goto="functions">All 25 modules</a></div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr><th>Module</th><th class="r">Lines</th><th class="r">Funcs</th><th class="r">Max CC</th><th class="r">High risk</th><th class="r">Dead</th><th class="r">Clones</th></tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td class="grow"><div class="path"><span>assets\scripts\Entity\bullet\</span><b>BaseBullet.ts</b></div></td>
+            <td class="r num">102</td>
+            <td class="r num">4</td>
+            <td class="r"><span class="cc "><span class="mini"><i style="width:100%"></i></span><span class="num">9</span></span></td>
+            <td class="r"><span class="pill">0</span></td>
+            <td class="r"><span class="pill">0</span></td>
+            <td class="r"><span class="pill warn">1</span></td>
+          </tr>
+          
+          <tr>
+            <td class="grow"><div class="path"><span>assets\scripts\Core\</span><b>EventBus.ts</b></div></td>
+            <td class="r num">69</td>
+            <td class="r num">3</td>
+            <td class="r"><span class="cc "><span class="mini"><i style="width:66%"></i></span><span class="num">6</span></span></td>
+            <td class="r"><span class="pill">0</span></td>
+            <td class="r"><span class="pill">0</span></td>
+            <td class="r"><span class="pill">0</span></td>
+          </tr>
+          
+          <tr>
+            <td class="grow"><div class="path"><span>assets\scripts\Entity\plane\enemy\</span><b>EnemyPlane.ts</b></div></td>
+            <td class="r num">94</td>
+            <td class="r num">6</td>
+            <td class="r"><span class="cc "><span class="mini"><i style="width:44%"></i></span><span class="num">4</span></span></td>
+            <td class="r"><span class="pill">0</span></td>
+            <td class="r"><span class="pill">0</span></td>
+            <td class="r"><span class="pill">0</span></td>
+          </tr>
+          
+          <tr>
+            <td class="grow"><div class="path"><span>assets\scripts\Core\</span><b>EffectManager.ts</b></div></td>
+            <td class="r num">81</td>
+            <td class="r num">5</td>
+            <td class="r"><span class="cc "><span class="mini"><i style="width:44%"></i></span><span class="num">4</span></span></td>
+            <td class="r"><span class="pill">0</span></td>
+            <td class="r"><span class="pill">0</span></td>
+            <td class="r"><span class="pill">0</span></td>
+          </tr>
+          
+          <tr>
+            <td class="grow"><div class="path"><span>assets\scripts\Entity\plane\</span><b>BasePlane.ts</b></div></td>
+            <td class="r num">50</td>
+            <td class="r num">4</td>
+            <td class="r"><span class="cc "><span class="mini"><i style="width:44%"></i></span><span class="num">4</span></span></td>
+            <td class="r"><span class="pill">0</span></td>
+            <td class="r"><span class="pill">0</span></td>
+            <td class="r"><span class="pill">0</span></td>
+          </tr>
+          
+          <tr>
+            <td class="grow"><div class="path"><span>assets\scripts\Manager\</span><b>WaveManager.ts</b></div></td>
+            <td class="r num">106</td>
+            <td class="r num">8</td>
+            <td class="r"><span class="cc "><span class="mini"><i style="width:33%"></i></span><span class="num">3</span></span></td>
+            <td class="r"><span class="pill">0</span></td>
+            <td class="r"><span class="pill warn">2</span></td>
+            <td class="r"><span class="pill">0</span></td>
+          </tr>
+          
+          <tr>
+            <td class="grow"><div class="path"><span>assets\scripts\Entity\plane\player\</span><b>PlayerPlane.ts</b></div></td>
+            <td class="r num">154</td>
+            <td class="r num">13</td>
+            <td class="r"><span class="cc "><span class="mini"><i style="width:33%"></i></span><span class="num">3</span></span></td>
+            <td class="r"><span class="pill">0</span></td>
+            <td class="r"><span class="pill warn">1</span></td>
+            <td class="r"><span class="pill warn">1</span></td>
+          </tr>
+          
+          <tr>
+            <td class="grow"><div class="path"><span>assets\scripts\Core\</span><b>PoolManager.ts</b></div></td>
+            <td class="r num">103</td>
+            <td class="r num">8</td>
+            <td class="r"><span class="cc "><span class="mini"><i style="width:33%"></i></span><span class="num">3</span></span></td>
+            <td class="r"><span class="pill">0</span></td>
+            <td class="r"><span class="pill warn">1</span></td>
+            <td class="r"><span class="pill warn">1</span></td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+    <p class="muted small note">Ranked by high-risk functions, then max complexity. Clones counts fragments that belong to a clone group.</p>
+  </div>
+  
+
+  
+  <div class="grid three">
+    
+    <div class="card">
+      <div class="card-h"><h2>Duplication</h2><a href="#duplication" data-goto="duplication">Details</a></div>
+      <div class="big num">23.1%<small>of 52 fragments</small></div>
+      
+      <div class="stack" role="img" aria-label="Clone fragments by type"><i class="t2" style="width:50.0%" title="Type-2 renamed · 6 fragments"></i><i class="t4" style="width:50.0%" title="Type-4 semantic · 6 fragments"></i></div>
+      <div class="legend"><span><i class="t2"></i>Type-2 renamed · 6 fragments</span><span><i class="t4"></i>Type-4 semantic · 6 fragments</span></div>
+      
+      <dl class="kv"><dt>Clone groups</dt><dd class="num ">4</dd><dt>Clone pairs</dt><dd class="num ">11</dd><dt>Avg similarity</dt><dd class="num ">78.3%</dd><dt>Files with clones</dt><dd class="num ">10 of 25</dd></dl>
+    </div>
+    
+    
+    <div class="card">
+      <div class="card-h"><h2>Classes</h2><a href="#classes" data-goto="classes">Details</a></div>
+      <div class="big num">25<small>classes</small></div>
+      <dl class="kv"><dt>High coupling</dt><dd class="num good">0</dd><dt>Medium coupling</dt><dd class="num ">0</dd><dt>Average CBO</dt><dd class="num ">2.04</dd><dt>Most coupled</dt><dd class="mono ">assets\scripts\Core\EffectManager (4)</dd></dl>
+    </div>
+    
+    
+    <div class="card">
+      <div class="card-h"><h2>Structure</h2><a href="#architecture" data-goto="architecture">Details</a></div>
+      <div class="big num">0<small>circular dependencies</small></div>
+      <dl class="kv"><dt>Modules / edges</dt><dd class="num ">25 / 50</dd><dt>Max dependency depth</dt><dd class="num ">5</dd><dt>Avg instability</dt><dd class="num ">0.63</dd><dt>Main sequence deviation</dt><dd class="num ">0.37</dd></dl>
+    </div>
+    
+  </div>
+  
+</section>
+
+
+
+<section id="functions" class="panel">
+  <div class="panel-h">
+    <h2>Functions</h2>
+    <div class="scores">
+      <span class="score-pill ok">Complexity <b class="num">100</b>/100</span>
+      <span class="score-pill ok">Dead code <b class="num">90</b>/100</span>
+    </div>
+  </div>
+
+  
+  <div class="card">
+    <div class="card-h"><h2>Complexity</h2></div>
+    <div class="strip">
+      <div class="s"><div class="v num">113</div><div class="l">functions</div></div>
+      <div class="s"><div class="v num">1.73</div><div class="l">average CC</div></div>
+      <div class="s"><div class="v num">9</div><div class="l">max CC</div></div>
+      <div class="s"><div class="v num">0</div><div class="l">high risk</div></div>
+      <div class="s"><div class="v num">0</div><div class="l">medium risk</div></div>
+    </div>
+
+    
+    <h3>Most complex functions</h3>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Function</th><th>File</th><th class="r">CC</th><th class="r">Nesting</th><th class="r">Lines</th><th>Risk</th></tr></thead>
+        <tbody>
+          
+          <tr>
+            <td class="mono">onBeginContact</td>
+            <td class="mono muted">assets\scripts\Entity\bullet\BaseBullet.ts:69</td>
+            <td class="r num">9</td>
+            <td class="r num">1</td>
+            <td class="r num">29</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">off</td>
+            <td class="mono muted">assets\scripts\Core\EventBus.ts:31</td>
+            <td class="r num">6</td>
+            <td class="r num">2</td>
+            <td class="r num">20</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">update</td>
+            <td class="mono muted">assets\scripts\Entity\bullet\BaseBullet.ts:45</td>
+            <td class="r num">6</td>
+            <td class="r num">1</td>
+            <td class="r num">23</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">on</td>
+            <td class="mono muted">assets\scripts\Core\EventBus.ts:8</td>
+            <td class="r num">5</td>
+            <td class="r num">2</td>
+            <td class="r num">21</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">anonymous_66</td>
+            <td class="mono muted">assets\scripts\Core\EffectManager.ts:66</td>
+            <td class="r num">4</td>
+            <td class="r num">1</td>
+            <td class="r num">5</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">dispatchEvent</td>
+            <td class="mono muted">assets\scripts\Core\EventBus.ts:52</td>
+            <td class="r num">4</td>
+            <td class="r num">2</td>
+            <td class="r num">15</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">takeDamage</td>
+            <td class="mono muted">assets\scripts\Entity\plane\BasePlane.ts:25</td>
+            <td class="r num">4</td>
+            <td class="r num">1</td>
+            <td class="r num">10</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">update</td>
+            <td class="mono muted">assets\scripts\Entity\plane\enemy\EnemyPlane.ts:47</td>
+            <td class="r num">4</td>
+            <td class="r num">1</td>
+            <td class="r num">21</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">play</td>
+            <td class="mono muted">assets\scripts\Core\EffectManager.ts:35</td>
+            <td class="r num">3</td>
+            <td class="r num">1</td>
+            <td class="r num">38</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">getNode</td>
+            <td class="mono muted">assets\scripts\Core\PoolManager.ts:26</td>
+            <td class="r num">3</td>
+            <td class="r num">2</td>
+            <td class="r num">23</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">putNode</td>
+            <td class="mono muted">assets\scripts\Core\PoolManager.ts:51</td>
+            <td class="r num">3</td>
+            <td class="r num">1</td>
+            <td class="r num">16</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">takeDamage</td>
+            <td class="mono muted">assets\scripts\Entity\plane\enemy\EnemyPlane.ts:76</td>
+            <td class="r num">3</td>
+            <td class="r num">1</td>
+            <td class="r num">7</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">update</td>
+            <td class="mono muted">assets\scripts\Entity\plane\player\PlayerPlane.ts:60</td>
+            <td class="r num">3</td>
+            <td class="r num">1</td>
+            <td class="r num">11</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">setBulletsEnabled</td>
+            <td class="mono muted">assets\scripts\Manager\BulletManager.ts:44</td>
+            <td class="r num">3</td>
+            <td class="r num">2</td>
+            <td class="r num">11</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">spawnBullet</td>
+            <td class="mono muted">assets\scripts\Manager\BulletManager.ts:57</td>
+            <td class="r num">3</td>
+            <td class="r num">1</td>
+            <td class="r num">13</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">setEnemiesEabled</td>
+            <td class="mono muted">assets\scripts\Manager\EnemyPlaneManager.ts:58</td>
+            <td class="r num">3</td>
+            <td class="r num">2</td>
+            <td class="r num">10</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">onStateChanged</td>
+            <td class="mono muted">assets\scripts\Manager\WaveManager.ts:69</td>
+            <td class="r num">3</td>
+            <td class="r num">2</td>
+            <td class="r num">12</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">onLoad</td>
+            <td class="mono muted">assets\scripts\Core\AudioManager.ts:16</td>
+            <td class="r num">2</td>
+            <td class="r num">1</td>
+            <td class="r num">7</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">playOneShot</td>
+            <td class="mono muted">assets\scripts\Core\AudioManager.ts:32</td>
+            <td class="r num">2</td>
+            <td class="r num">1</td>
+            <td class="r num">8</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+          <tr>
+            <td class="mono">play</td>
+            <td class="mono muted">assets\scripts\Core\AudioManager.ts:49</td>
+            <td class="r num">2</td>
+            <td class="r num">1</td>
+            <td class="r num">15</td>
+            <td><span class="pill risk-low">low</span></td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+    <p class="muted small note">Showing top 20 of 113 functions</p>
+    
+  </div>
+  
+
+  
+  <div class="card">
+    <div class="card-h"><h2>Dead code</h2></div>
+    <div class="strip">
+      <div class="s"><div class="v num">16</div><div class="l">findings</div></div>
+      <div class="s"><div class="v num">0</div><div class="l">critical</div></div>
+      <div class="s"><div class="v num warn">16</div><div class="l">warnings</div></div>
+      <div class="s"><div class="v num">14</div><div class="l">files affected</div></div>
+    </div>
+    
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>File</th><th>Function</th><th class="r">Lines</th><th>Severity</th><th>Reason</th></tr></thead>
+        <tbody>
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\Core\PoolManager.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">1-1</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Imported name &#39;_decorator&#39; from &#39;cc&#39; is never used</td>
+          </tr>
+          
+          
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\Entity\plane\player\PlayerPlane.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">9-154</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Exported function &#39;player&#39; is not imported by any other analyzed file</td>
+          </tr>
+          
+          
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\Manager\GameManager.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">7-75</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Exported function &#39;GameManager&#39; is not imported by any other analyzed file</td>
+          </tr>
+          
+          
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\Manager\WaveManager.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">1-1</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Imported name &#39;Node&#39; from &#39;cc&#39; is never used</td>
+          </tr>
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\Manager\WaveManager.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">9-103</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Exported function &#39;WaveManager&#39; is not imported by any other analyzed file</td>
+          </tr>
+          
+          
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\UI\OverPanel.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">6-27</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Exported function &#39;OverPanel&#39; is not imported by any other analyzed file</td>
+          </tr>
+          
+          
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\UI\Pause.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">6-19</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Exported function &#39;Pause&#39; is not imported by any other analyzed file</td>
+          </tr>
+          
+          
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\UI\PausePanel.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">6-32</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Exported function &#39;PausePanel&#39; is not imported by any other analyzed file</td>
+          </tr>
+          
+          
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\UI\Quit.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">6-19</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Exported function &#39;Quit&#39; is not imported by any other analyzed file</td>
+          </tr>
+          
+          
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\UI\Restart.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">6-20</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Exported function &#39;ReStart&#39; is not imported by any other analyzed file</td>
+          </tr>
+          
+          
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\UI\Resume.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">6-20</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Exported function &#39;Resume&#39; is not imported by any other analyzed file</td>
+          </tr>
+          
+          
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\UI\Start.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">6-23</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Exported function &#39;Start&#39; is not imported by any other analyzed file</td>
+          </tr>
+          
+          
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\UI\StartPannel.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">5-8</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Exported function &#39;StartPannel&#39; is not imported by any other analyzed file</td>
+          </tr>
+          
+          
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\UI\VictoryPanel.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">1-1</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Imported name &#39;Node&#39; from &#39;cc&#39; is never used</td>
+          </tr>
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\UI\VictoryPanel.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">6-25</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Exported function &#39;VictoryPanel&#39; is not imported by any other analyzed file</td>
+          </tr>
+          
+          
+          
+          
+          
+          <tr>
+            <td class="mono muted">assets\scripts\background.ts</td>
+            <td class="mono"><em>&lt;file-level&gt;</em></td>
+            <td class="r num">6-63</td>
+            <td><span class="pill sev-warning">warning</span></td>
+            <td class="wrap">Exported function &#39;background&#39; is not imported by any other analyzed file</td>
+          </tr>
+          
+          
+          
+          
+        </tbody>
+      </table>
+    </div>
+    
+    
+  </div>
+  
+
+  
+  <details class="card">
+    <summary><h2>All modules</h2><span class="muted small">25 modules · click a column to sort</span></summary>
+    <div class="tbl-wrap">
+      <table id="module-quality-table" class="tbl">
+        <thead>
+          <tr>
+            <th><button type="button" class="table-sort" aria-label="Sort by module name" onclick="sortModuleQuality(0, false, this)">Module</button></th>
+            <th><button type="button" class="table-sort" aria-label="Sort by file path" onclick="sortModuleQuality(1, false, this)">File</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by lines of code" onclick="sortModuleQuality(2, true, this)">LOC</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by analyzed function count" onclick="sortModuleQuality(3, true, this)">Analyzed</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by average complexity" onclick="sortModuleQuality(4, true, this)">Avg CC</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by maximum complexity" onclick="sortModuleQuality(5, true, this)">Max CC</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by high-risk function count" onclick="sortModuleQuality(6, true, this)">High Risk</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by exception handler count" onclick="sortModuleQuality(7, true, this)">Handlers</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by dead-code findings" onclick="sortModuleQuality(8, true, this)">Dead Findings</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by dead-code blocks" onclick="sortModuleQuality(9, true, this)">Dead Blocks</button></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td class="mono" data-sort-value="BaseBullet">BaseBullet</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Entity\bullet\BaseBullet.ts">assets\scripts\Entity\bullet\BaseBullet.ts</td>
+            <td class="r num" data-sort-value="102">102</td>
+            <td class="r num" data-sort-value="4">4</td>
+            <td class="r num" data-sort-value="4.5">4.50</td>
+            <td class="r num" data-sort-value="9">9</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="EventBus">EventBus</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Core\EventBus.ts">assets\scripts\Core\EventBus.ts</td>
+            <td class="r num" data-sort-value="69">69</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="5">5.00</td>
+            <td class="r num" data-sort-value="6">6</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="EffectManager">EffectManager</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Core\EffectManager.ts">assets\scripts\Core\EffectManager.ts</td>
+            <td class="r num" data-sort-value="81">81</td>
+            <td class="r num" data-sort-value="5">5</td>
+            <td class="r num" data-sort-value="2.4">2.40</td>
+            <td class="r num" data-sort-value="4">4</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="BasePlane">BasePlane</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Entity\plane\BasePlane.ts">assets\scripts\Entity\plane\BasePlane.ts</td>
+            <td class="r num" data-sort-value="50">50</td>
+            <td class="r num" data-sort-value="4">4</td>
+            <td class="r num" data-sort-value="2">2.00</td>
+            <td class="r num" data-sort-value="4">4</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="EnemyPlane">EnemyPlane</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Entity\plane\enemy\EnemyPlane.ts">assets\scripts\Entity\plane\enemy\EnemyPlane.ts</td>
+            <td class="r num" data-sort-value="94">94</td>
+            <td class="r num" data-sort-value="6">6</td>
+            <td class="r num" data-sort-value="2">2.00</td>
+            <td class="r num" data-sort-value="4">4</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="PoolManager">PoolManager</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Core\PoolManager.ts">assets\scripts\Core\PoolManager.ts</td>
+            <td class="r num" data-sort-value="103">103</td>
+            <td class="r num" data-sort-value="8">8</td>
+            <td class="r num" data-sort-value="2.25">2.25</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="BulletManager">BulletManager</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Manager\BulletManager.ts">assets\scripts\Manager\BulletManager.ts</td>
+            <td class="r num" data-sort-value="93">93</td>
+            <td class="r num" data-sort-value="7">7</td>
+            <td class="r num" data-sort-value="2">2.00</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="EnemyPlaneManager">EnemyPlaneManager</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Manager\EnemyPlaneManager.ts">assets\scripts\Manager\EnemyPlaneManager.ts</td>
+            <td class="r num" data-sort-value="105">105</td>
+            <td class="r num" data-sort-value="9">9</td>
+            <td class="r num" data-sort-value="1.7777777777777777">1.78</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="PlayerPlane">PlayerPlane</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Entity\plane\player\PlayerPlane.ts">assets\scripts\Entity\plane\player\PlayerPlane.ts</td>
+            <td class="r num" data-sort-value="154">154</td>
+            <td class="r num" data-sort-value="13">13</td>
+            <td class="r num" data-sort-value="1.3846153846153846">1.38</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="WaveManager">WaveManager</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Manager\WaveManager.ts">assets\scripts\Manager\WaveManager.ts</td>
+            <td class="r num" data-sort-value="106">106</td>
+            <td class="r num" data-sort-value="8">8</td>
+            <td class="r num" data-sort-value="1.375">1.38</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="2">2</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="background">background</td>
+            <td class="mono muted" data-sort-value="assets\scripts\background.ts">assets\scripts\background.ts</td>
+            <td class="r num" data-sort-value="63">63</td>
+            <td class="r num" data-sort-value="4">4</td>
+            <td class="r num" data-sort-value="1.75">1.75</td>
+            <td class="r num" data-sort-value="2">2</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="AudioManager">AudioManager</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Core\AudioManager.ts">assets\scripts\Core\AudioManager.ts</td>
+            <td class="r num" data-sort-value="88">88</td>
+            <td class="r num" data-sort-value="6">6</td>
+            <td class="r num" data-sort-value="1.5">1.50</td>
+            <td class="r num" data-sort-value="2">2</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="GameManager">GameManager</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Manager\GameManager.ts">assets\scripts\Manager\GameManager.ts</td>
+            <td class="r num" data-sort-value="75">75</td>
+            <td class="r num" data-sort-value="10">10</td>
+            <td class="r num" data-sort-value="1.1">1.10</td>
+            <td class="r num" data-sort-value="2">2</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="VictoryPanel">VictoryPanel</td>
+            <td class="mono muted" data-sort-value="assets\scripts\UI\VictoryPanel.ts">assets\scripts\UI\VictoryPanel.ts</td>
+            <td class="r num" data-sort-value="28">28</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="1">1.00</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="2">2</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="OverPanel">OverPanel</td>
+            <td class="mono muted" data-sort-value="assets\scripts\UI\OverPanel.ts">assets\scripts\UI\OverPanel.ts</td>
+            <td class="r num" data-sort-value="30">30</td>
+            <td class="r num" data-sort-value="4">4</td>
+            <td class="r num" data-sort-value="1">1.00</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="Pause">Pause</td>
+            <td class="mono muted" data-sort-value="assets\scripts\UI\Pause.ts">assets\scripts\UI\Pause.ts</td>
+            <td class="r num" data-sort-value="22">22</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="1">1.00</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="PausePanel">PausePanel</td>
+            <td class="mono muted" data-sort-value="assets\scripts\UI\PausePanel.ts">assets\scripts\UI\PausePanel.ts</td>
+            <td class="r num" data-sort-value="32">32</td>
+            <td class="r num" data-sort-value="4">4</td>
+            <td class="r num" data-sort-value="1">1.00</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="Quit">Quit</td>
+            <td class="mono muted" data-sort-value="assets\scripts\UI\Quit.ts">assets\scripts\UI\Quit.ts</td>
+            <td class="r num" data-sort-value="22">22</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="1">1.00</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="Restart">Restart</td>
+            <td class="mono muted" data-sort-value="assets\scripts\UI\Restart.ts">assets\scripts\UI\Restart.ts</td>
+            <td class="r num" data-sort-value="23">23</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="1">1.00</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="Resume">Resume</td>
+            <td class="mono muted" data-sort-value="assets\scripts\UI\Resume.ts">assets\scripts\UI\Resume.ts</td>
+            <td class="r num" data-sort-value="23">23</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="1">1.00</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="Start">Start</td>
+            <td class="mono muted" data-sort-value="assets\scripts\UI\Start.ts">assets\scripts\UI\Start.ts</td>
+            <td class="r num" data-sort-value="26">26</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="1">1.00</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="StartPannel">StartPannel</td>
+            <td class="mono muted" data-sort-value="assets\scripts\UI\StartPannel.ts">assets\scripts\UI\StartPannel.ts</td>
+            <td class="r num" data-sort-value="11">11</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0.00</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="GameConstants">GameConstants</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Core\GameConstants.ts">assets\scripts\Core\GameConstants.ts</td>
+            <td class="r num" data-sort-value="66">66</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0.00</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="GameData">GameData</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Core\GameData.ts">assets\scripts\Core\GameData.ts</td>
+            <td class="r num" data-sort-value="8">8</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0.00</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="LevelConfig">LevelConfig</td>
+            <td class="mono muted" data-sort-value="assets\scripts\Core\LevelConfig.ts">assets\scripts\Core\LevelConfig.ts</td>
+            <td class="r num" data-sort-value="37">37</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0.00</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </details>
+  
+
+  
+  <details class="card">
+    <summary><h2>Directory Complexity</h2><span class="muted small">8 directories · click a column to sort</span></summary>
+    <div class="tbl-wrap">
+      <table id="directory-complexity-table" class="tbl">
+        <thead>
+          <tr>
+            <th><button type="button" class="table-sort" aria-label="Sort by directory path" onclick="sortDirectoryComplexity(0, false, this)">Directory</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by function count" onclick="sortDirectoryComplexity(1, true, this)">Functions</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by average complexity" onclick="sortDirectoryComplexity(2, true, this)">Avg CC</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by maximum complexity" onclick="sortDirectoryComplexity(3, true, this)">Max CC</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by high-risk function count" onclick="sortDirectoryComplexity(4, true, this)">High Risk</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by average nesting depth" onclick="sortDirectoryComplexity(5, true, this)">Avg Nesting</button></th>
+            <th class="r"><button type="button" class="table-sort" aria-label="Sort by maximum nesting depth" onclick="sortDirectoryComplexity(6, true, this)">Max Nesting</button></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td class="mono" data-sort-value="Entity\bullet">Entity\bullet</td>
+            <td class="r num" data-sort-value="4">4</td>
+            <td class="r num" data-sort-value="4.5">4.50</td>
+            <td class="r num" data-sort-value="9">9</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0.75">0.75</td>
+            <td class="r num" data-sort-value="1">1</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="Core">Core</td>
+            <td class="r num" data-sort-value="22">22</td>
+            <td class="r num" data-sort-value="2.4545454545454546">2.45</td>
+            <td class="r num" data-sort-value="6">6</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="1">1.00</td>
+            <td class="r num" data-sort-value="2">2</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="Entity\plane">Entity\plane</td>
+            <td class="r num" data-sort-value="4">4</td>
+            <td class="r num" data-sort-value="2">2.00</td>
+            <td class="r num" data-sort-value="4">4</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0.5">0.50</td>
+            <td class="r num" data-sort-value="1">1</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="Entity\plane\enemy">Entity\plane\enemy</td>
+            <td class="r num" data-sort-value="6">6</td>
+            <td class="r num" data-sort-value="2">2.00</td>
+            <td class="r num" data-sort-value="4">4</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0.5">0.50</td>
+            <td class="r num" data-sort-value="1">1</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="Manager">Manager</td>
+            <td class="r num" data-sort-value="34">34</td>
+            <td class="r num" data-sort-value="1.5294117647058822">1.53</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0.5294117647058824">0.53</td>
+            <td class="r num" data-sort-value="2">2</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="Entity\plane\player">Entity\plane\player</td>
+            <td class="r num" data-sort-value="13">13</td>
+            <td class="r num" data-sort-value="1.3846153846153846">1.38</td>
+            <td class="r num" data-sort-value="3">3</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0.3076923076923077">0.31</td>
+            <td class="r num" data-sort-value="1">1</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value=".">.</td>
+            <td class="r num" data-sort-value="4">4</td>
+            <td class="r num" data-sort-value="1.75">1.75</td>
+            <td class="r num" data-sort-value="2">2</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0.75">0.75</td>
+            <td class="r num" data-sort-value="1">1</td>
+          </tr>
+          
+          <tr>
+            <td class="mono" data-sort-value="UI">UI</td>
+            <td class="r num" data-sort-value="26">26</td>
+            <td class="r num" data-sort-value="1">1.00</td>
+            <td class="r num" data-sort-value="1">1</td>
+            <td class="r num" data-sort-value="0">0</td>
+            <td class="r num" data-sort-value="0">0.00</td>
+            <td class="r num" data-sort-value="0">0</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </details>
+  
+</section>
+
+
+
+
+<section id="duplication" class="panel">
+  <div class="panel-h">
+    <h2>Duplication</h2>
+    <div class="scores"><span class="score-pill watch">Duplication <b class="num">60</b>/100</span></div>
+  </div>
+  
+  <div class="card">
+    <div class="strip">
+      <div class="s"><div class="v num">12<small> / 52</small></div><div class="l">fragments cloned</div></div>
+      <div class="s"><div class="v num">4</div><div class="l">clone groups</div></div>
+      <div class="s"><div class="v num">11</div><div class="l">clone pairs</div></div>
+      <div class="s"><div class="v num">78.3%</div><div class="l">avg similarity</div></div>
+      <div class="s"><div class="v num">25</div><div class="l">files scanned</div></div>
+    </div>
+  </div>
+
+  
+  <div class="card">
+    <div class="card-h"><h2>Clone groups</h2><span class="muted small">fragments grouped by similarity</span></div>
+    
+    <div class="clone-group">
+      <div class="clone-group-h">
+        <span class="pill type t2">Type-2</span>
+        <b>Group 4</b>
+        <span class="muted">4 fragments · similarity 85.0%</span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl compact">
+          <thead><tr><th>File</th><th class="r">Lines</th><th class="r">Size</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td class="mono">assets\scripts\UI\Pause.ts</td>
+              <td class="r num">7-19</td>
+              <td class="r num">13 lines</td>
+            </tr>
+            
+            
+            <tr class="preview-row"><td colspan="3">
+              <div class="code-preview-card"><div class="code-preview-title">Code Preview</div><pre class="code-preview">export class Pause extends Component {
+    onLoad() {
+        this.node.on(Button.EventType.CLICK, this.onClick, this);
+    }
+    
+    onDestroy() {
+        this.node.off(Button.EventType.CLICK, this.onClick, this);
+    }
+...</pre></div>
+            </td></tr>
+            
+            
+            <tr>
+              <td class="mono">assets\scripts\UI\Quit.ts</td>
+              <td class="r num">7-19</td>
+              <td class="r num">13 lines</td>
+            </tr>
+            
+            
+            <tr class="preview-row"><td colspan="3">
+              <div class="code-preview-card"><div class="code-preview-title">Code Preview</div><pre class="code-preview">export class Quit extends Component {
+    onLoad() {
+        this.node.on(Button.EventType.CLICK, this.onClick, this);
+    }
+    onDestroy() {
+        this.node.off(Button.EventType.CLICK, this.onClick, this);
+    }
+    private onClick() {
+...</pre></div>
+            </td></tr>
+            
+            
+            <tr>
+              <td class="mono">assets\scripts\UI\Restart.ts</td>
+              <td class="r num">7-20</td>
+              <td class="r num">14 lines</td>
+            </tr>
+            
+            
+            <tr class="preview-row"><td colspan="3">
+              <div class="code-preview-card"><div class="code-preview-title">Code Preview</div><pre class="code-preview">export class ReStart extends Component {
+    
+    onLoad() {
+        this.node.on(Button.EventType.CLICK, this.onClick, this);
+    }
+
+    onDestroy() {
+        this.node.off(Button.EventType.CLICK, this.onClick, this);
+...</pre></div>
+            </td></tr>
+            
+            
+            <tr>
+              <td class="mono">assets\scripts\UI\Resume.ts</td>
+              <td class="r num">7-20</td>
+              <td class="r num">14 lines</td>
+            </tr>
+            
+            
+            <tr class="preview-row"><td colspan="3">
+              <div class="code-preview-card"><div class="code-preview-title">Code Preview</div><pre class="code-preview">export class Resume extends Component {
+    
+    onLoad() {
+        this.node.on(Button.EventType.CLICK, this.onClick, this);
+    }
+
+    onDestroy() {
+        this.node.off(Button.EventType.CLICK, this.onClick, this);
+...</pre></div>
+            </td></tr>
+            
+            
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="clone-group">
+      <div class="clone-group-h">
+        <span class="pill type t2">Type-2</span>
+        <b>Group 3</b>
+        <span class="muted">2 fragments · similarity 78.1%</span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl compact">
+          <thead><tr><th>File</th><th class="r">Lines</th><th class="r">Size</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td class="mono">assets\scripts\Manager\BulletManager.ts</td>
+              <td class="r num">44-54</td>
+              <td class="r num">11 lines</td>
+            </tr>
+            
+            
+            <tr class="preview-row"><td colspan="3">
+              <div class="code-preview-card"><div class="code-preview-title">Code Preview</div><pre class="code-preview">    private setBulletsEnabled(isEnabled:boolean){
+        const bullets = this.node.children;
+        const length = bullets.length;
+        for(let i=length-1;i&gt;=0;--i){
+            const bullet = bullets[i].getComponent(BaseBullet);
+            if(bullet){
+                bullet.enabled = isEnabled;
+            }
+...</pre></div>
+            </td></tr>
+            
+            
+            <tr>
+              <td class="mono">assets\scripts\Manager\EnemyPlaneManager.ts</td>
+              <td class="r num">58-67</td>
+              <td class="r num">10 lines</td>
+            </tr>
+            
+            
+            <tr class="preview-row"><td colspan="3">
+              <div class="code-preview-card"><div class="code-preview-title">Code Preview</div><pre class="code-preview">    private setEnemiesEabled(isEnabled:boolean){
+        const enemies = this.node.children;
+
+        for(let i = enemies.length - 1;i &gt;= 0;--i){
+            const enemy = enemies[i].getComponent(EnemyPlane);
+            if(enemy){
+                enemy.enabled = isEnabled;
+            }   
+...</pre></div>
+            </td></tr>
+            
+            
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="clone-group">
+      <div class="clone-group-h">
+        <span class="pill type t4">Type-4</span>
+        <b>Group 2</b>
+        <span class="muted">2 fragments · similarity 68.7%</span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl compact">
+          <thead><tr><th>File</th><th class="r">Lines</th><th class="r">Size</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td class="mono">assets\scripts\Entity\plane\player\PlayerPlane.ts</td>
+              <td class="r num">23-40</td>
+              <td class="r num">18 lines</td>
+            </tr>
+            
+            
+            <tr class="preview-row"><td colspan="3">
+              <div class="code-preview-card"><div class="code-preview-title">Code Preview</div><pre class="code-preview">    onLoad() {
+        const size = view.getVisibleSize();
+        this.scrWidth = size.width;
+        this.scrHeight = size.height;
+
+        // 拿飞机自身的尺寸
+        const ut = this.getComponent(UITransform)!;
+        this.halfW = ut.width * ut.anchorX;         // 锚点左侧宽度
+...</pre></div>
+            </td></tr>
+            
+            
+            <tr>
+              <td class="mono">assets\scripts\Manager\EnemyPlaneManager.ts</td>
+              <td class="r num">23-33</td>
+              <td class="r num">11 lines</td>
+            </tr>
+            
+            
+            <tr class="preview-row"><td colspan="3">
+              <div class="code-preview-card"><div class="code-preview-title">Code Preview</div><pre class="code-preview">    onLoad() {
+        EnemyManager._instance = this;
+        const size = view.getVisibleSize();
+        this.scrWidth = size.width;
+        this.topY = size.height / 2;
+        EventBus.on(GameConstants.EVENT_TYPE.GAME_RESET,this.onGameReset,this);
+        EventBus.on(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this.onStateChanged,this);
+        EventBus.on(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.onEnemyRecycle, this);
+...</pre></div>
+            </td></tr>
+            
+            
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="clone-group">
+      <div class="clone-group-h">
+        <span class="pill type t4">Type-4</span>
+        <b>Group 1</b>
+        <span class="muted">4 fragments · similarity 68.0%</span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl compact">
+          <thead><tr><th>File</th><th class="r">Lines</th><th class="r">Size</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td class="mono">assets\scripts\Core\PoolManager.ts</td>
+              <td class="r num">3-100</td>
+              <td class="r num">98 lines</td>
+            </tr>
+            
+            
+            <tr class="preview-row"><td colspan="3">
+              <div class="code-preview-card"><div class="code-preview-title">Code Preview</div><pre class="code-preview">export class PoolManager {
+
+    private _dictPool: any = {};
+   
+
+    private static  _instance:PoolManager = null;
+
+    static get instance():PoolManager{
+...</pre></div>
+            </td></tr>
+            
+            
+            <tr>
+              <td class="mono">assets\scripts\Entity\bullet\BaseBullet.ts</td>
+              <td class="r num">8-102</td>
+              <td class="r num">95 lines</td>
+            </tr>
+            
+            
+            <tr class="preview-row"><td colspan="3">
+              <div class="code-preview-card"><div class="code-preview-title">Code Preview</div><pre class="code-preview">export class BaseBullet extends Component {
+    @property({ tooltip: &#34;子弹速度&#34; })
+    public speed: number = 200;
+
+    @property({ tooltip: &#34;子弹伤害&#34; })
+    public damage: number = 100;
+
+    @property({ tooltip: &#34;最大射程&#34; })
+...</pre></div>
+            </td></tr>
+            
+            
+            <tr>
+              <td class="mono">assets\scripts\Manager\BulletManager.ts</td>
+              <td class="r num">9-90</td>
+              <td class="r num">82 lines</td>
+            </tr>
+            
+            
+            <tr class="preview-row"><td colspan="3">
+              <div class="code-preview-card"><div class="code-preview-title">Code Preview</div><pre class="code-preview">export class BulletManager extends Component {
+
+    static instance: BulletManager = null!;   
+
+    @property(Prefab)
+    playerBulletPrefab: Prefab = null;
+
+    @property(Prefab)
+...</pre></div>
+            </td></tr>
+            
+            
+            <tr>
+              <td class="mono">assets\scripts\background.ts</td>
+              <td class="r num">7-63</td>
+              <td class="r num">57 lines</td>
+            </tr>
+            
+            
+            <tr class="preview-row"><td colspan="3">
+              <div class="code-preview-card"><div class="code-preview-title">Code Preview</div><pre class="code-preview">export class background extends Component {
+
+    @property speed = 200;
+
+    private bgs: Node[] = [];
+    private bgHeight = 0;
+    private screenHeight = 0;
+
+...</pre></div>
+            </td></tr>
+            
+            
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    
+  </div>
+  
+  
+</section>
+
+
+
+
+<section id="classes" class="panel">
+  <div class="panel-h">
+    <h2>Classes</h2>
+    <div class="scores">
+      <span class="score-pill ok">Coupling <b class="num">100</b>/100</span>
+      
+    </div>
+  </div>
+
+  
+  <div class="card">
+    <div class="card-h"><h2>Coupling</h2><span class="muted small">Coupling Between Objects (CBO)</span></div>
+    <div class="strip">
+      <div class="s"><div class="v num">25</div><div class="l">classes</div></div>
+      <div class="s"><div class="v num">0</div><div class="l">high coupling</div></div>
+      <div class="s"><div class="v num">0</div><div class="l">medium coupling</div></div>
+      <div class="s"><div class="v num">2.04</div><div class="l">average CBO</div></div>
+      <div class="s"><div class="v num">4</div><div class="l">max CBO</div></div>
+    </div>
+    
+    <h3>Most coupled classes</h3>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Class</th><th>File</th><th class="r">CBO</th><th>Risk</th><th>Depends on</th></tr></thead>
+        <tbody>
+          
+          <tr>
+            <td class="mono">assets\scripts\Core\EffectManager</td>
+            <td class="mono muted">assets\scripts\Core\EffectManager.ts:1</td>
+            <td class="r num">4</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">EventBus, GameConstants, PoolManager, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\Entity\plane\enemy\EnemyPlane</td>
+            <td class="mono muted">assets\scripts\Entity\plane\enemy\EnemyPlane.ts:1</td>
+            <td class="r num">4</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">BasePlane, Core, Manager, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\Entity\plane\player\PlayerPlane</td>
+            <td class="mono muted">assets\scripts\Entity\plane\player\PlayerPlane.ts:2</td>
+            <td class="r num">4</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">BasePlane, Core, Manager, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\Manager\EnemyPlaneManager</td>
+            <td class="mono muted">assets\scripts\Manager\EnemyPlaneManager.ts:1</td>
+            <td class="r num">4</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, EnemyManager, Entity, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\Entity\bullet\BaseBullet</td>
+            <td class="mono muted">assets\scripts\Entity\bullet\BaseBullet.ts:1</td>
+            <td class="r num">3</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, cc, plane</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\Manager\BulletManager</td>
+            <td class="mono muted">assets\scripts\Manager\BulletManager.ts:1</td>
+            <td class="r num">3</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, Entity, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\Manager\WaveManager</td>
+            <td class="mono muted">assets\scripts\Manager\WaveManager.ts:1</td>
+            <td class="r num">3</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, EnemyPlaneManager, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\Core\PoolManager</td>
+            <td class="mono muted">assets\scripts\Core\PoolManager.ts:1</td>
+            <td class="r num">2</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">PoolManager, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\Manager\GameManager</td>
+            <td class="mono muted">assets\scripts\Manager\GameManager.ts:1</td>
+            <td class="r num">2</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\UI\OverPanel</td>
+            <td class="mono muted">assets\scripts\UI\OverPanel.ts:1</td>
+            <td class="r num">2</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\UI\Pause</td>
+            <td class="mono muted">assets\scripts\UI\Pause.ts:1</td>
+            <td class="r num">2</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\UI\PausePanel</td>
+            <td class="mono muted">assets\scripts\UI\PausePanel.ts:1</td>
+            <td class="r num">2</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\UI\Quit</td>
+            <td class="mono muted">assets\scripts\UI\Quit.ts:1</td>
+            <td class="r num">2</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\UI\Restart</td>
+            <td class="mono muted">assets\scripts\UI\Restart.ts:1</td>
+            <td class="r num">2</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\UI\Resume</td>
+            <td class="mono muted">assets\scripts\UI\Resume.ts:1</td>
+            <td class="r num">2</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\UI\Start</td>
+            <td class="mono muted">assets\scripts\UI\Start.ts:1</td>
+            <td class="r num">2</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\UI\VictoryPanel</td>
+            <td class="mono muted">assets\scripts\UI\VictoryPanel.ts:1</td>
+            <td class="r num">2</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\background</td>
+            <td class="mono muted">assets\scripts\background.ts:1</td>
+            <td class="r num">2</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">Core, cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\Core\AudioManager</td>
+            <td class="mono muted">assets\scripts\Core\AudioManager.ts:1</td>
+            <td class="r num">1</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">cc</td>
+          </tr>
+          
+          <tr>
+            <td class="mono">assets\scripts\Core\EventBus</td>
+            <td class="mono muted">assets\scripts\Core\EventBus.ts:1</td>
+            <td class="r num">1</td>
+            <td><span class="pill risk-low">low</span></td>
+            <td class="mono small wrap">cc</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+    <p class="muted small note">Showing top 20 of 25 classes</p>
+    
+  </div>
+  
+
+  
+</section>
+
+
+
+
+<section id="architecture" class="panel">
+  <div class="panel-h">
+    <h2>Architecture</h2>
+    <div class="scores"><span class="score-pill ok">Dependencies <b class="num">95</b>/100</span></div>
+  </div>
+
+  
+  <div class="card">
+    <div class="card-h"><h2>Module dependencies</h2></div>
+    <div class="strip">
+      <div class="s"><div class="v num">25</div><div class="l">modules</div></div>
+      <div class="s"><div class="v num">50</div><div class="l">dependencies</div></div>
+      <div class="s"><div class="v num">13</div><div class="l">entry points</div></div>
+      <div class="s"><div class="v num">5</div><div class="l">max depth</div></div>
+      <div class="s"><div class="v num good">0</div><div class="l">circular dependencies</div></div>
+      
+      <div class="s"><div class="v num">0.63</div><div class="l">avg instability</div></div>
+      <div class="s"><div class="v num">0.37</div><div class="l">main sequence deviation</div></div>
+      
+    </div>
+
+    
+    
+    <h3>Main sequence</h3>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Zone</th><th>Modules</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill bad">Zone of pain</span></td><td class="mono small wrap">assets/scripts/Core/AudioManager.ts, assets/scripts/Core/EventBus.ts, assets/scripts/Core/GameConstants.ts, assets/scripts/Core/GameData.ts, assets/scripts/Core/PoolManager.ts, assets/scripts/Entity/plane/BasePlane.ts</td></tr>
+          
+          <tr><td><span class="pill good">Main sequence</span></td><td class="mono small wrap">assets/scripts/Core/EffectManager.ts, assets/scripts/Entity/bullet/BaseBullet.ts, assets/scripts/Entity/plane/enemy/EnemyPlane.ts, assets/scripts/Entity/plane/player/PlayerPlane.ts, assets/scripts/Manager/EnemyPlaneManager.ts, assets/scripts/Manager/GameManager.ts, assets/scripts/Manager/WaveManager.ts, assets/scripts/UI/OverPanel.ts, assets/scripts/UI/Pause.ts, assets/scripts/UI/PausePanel.ts, assets/scripts/UI/Quit.ts, assets/scripts/UI/Restart.ts, assets/scripts/UI/Resume.ts, assets/scripts/UI/Start.ts, assets/scripts/UI/VictoryPanel.ts, assets/scripts/background.ts</td></tr>
+        </tbody>
+      </table>
+    </div>
+    
+    
+
+    
+    <h3>Circular dependencies</h3>
+    
+    <p class="ok-msg">No circular dependencies detected. Every module has an acyclic import graph.</p>
+    
+    
+
+    
+    <h3>Longest dependency chains</h3>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th class="r">#</th><th class="r">Depth</th><th>Path</th></tr></thead>
+        <tbody>
+          
+          <tr><td class="r num">1</td><td class="r num">5</td><td class="mono small wrap">assets/scripts/Manager/WaveManager.ts → assets/scripts/Manager/EnemyPlaneManager.ts → assets/scripts/Entity/plane/enemy/EnemyPlane.ts → assets/scripts/Manager/BulletManager.ts → assets/scripts/Entity/bullet/BaseBullet.ts → assets/scripts/Core/EventBus.ts</td></tr>
+          
+          <tr><td class="r num">2</td><td class="r num">3</td><td class="mono small wrap">assets/scripts/Entity/plane/player/PlayerPlane.ts → assets/scripts/Manager/BulletManager.ts → assets/scripts/Entity/bullet/BaseBullet.ts → assets/scripts/Core/EventBus.ts</td></tr>
+          
+          <tr><td class="r num">3</td><td class="r num">1</td><td class="mono small wrap">assets/scripts/Manager/GameManager.ts → assets/scripts/Core/AudioManager.ts</td></tr>
+          
+          <tr><td class="r num">4</td><td class="r num">1</td><td class="mono small wrap">assets/scripts/UI/OverPanel.ts → assets/scripts/Core/EventBus.ts</td></tr>
+          
+          <tr><td class="r num">5</td><td class="r num">1</td><td class="mono small wrap">assets/scripts/UI/Pause.ts → assets/scripts/Core/EventBus.ts</td></tr>
+          
+        </tbody>
+      </table>
+    </div>
+    
+  </div>
+  
+</section>
+
+
+</main>
+
+<footer>
+  <span>Generated by polyscan 0.6.0 · 2026-10-21 20:00:41</span>
+  <a href="https://github.com/ludo-technologies/polyscan" target="_blank" rel="noopener noreferrer">&#9733; Star polyscan on GitHub</a>
+</footer>
+
+<script>(function () {
+  var tabs = document.querySelectorAll('.tab');
+  var panels = document.querySelectorAll('.panel');
+
+  function show(id) {
+    var target = null;
+    panels.forEach(function (p) { if (p.id === id) { target = p; } });
+    if (!target) { return; }
+    panels.forEach(function (p) { p.classList.toggle('active', p === target); });
+    tabs.forEach(function (t) { t.classList.toggle('active', t.dataset.tab === id); });
+    window.scrollTo({ top: 0 });
+    try { history.replaceState(null, '', '#' + id); } catch (e) { /* sandboxed viewers may forbid this */ }
+  }
+
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () { show(t.dataset.tab); });
+  });
+  document.querySelectorAll('[data-goto]').forEach(function (a) {
+    a.addEventListener('click', function (e) { e.preventDefault(); show(a.dataset.goto); });
+  });
+  if (location.hash.length > 1) { show(location.hash.slice(1)); } // unknown hashes leave the overview active
+})();
+
+function sortQualityTable(tableID, columnIndex, numeric, button) {
+  var table = document.getElementById(tableID);
+  if (!table) { return; }
+
+  var body = table.tBodies[0];
+  var rows = Array.prototype.slice.call(body.rows);
+  var direction = button.dataset.direction === 'asc' ? 'desc' : 'asc';
+  var multiplier = direction === 'asc' ? 1 : -1;
+
+  rows.sort(function (left, right) {
+    var leftValue = left.cells[columnIndex].dataset.sortValue || '';
+    var rightValue = right.cells[columnIndex].dataset.sortValue || '';
+    var comparison = numeric
+      ? Number(leftValue) - Number(rightValue)
+      : leftValue.localeCompare(rightValue);
+    return comparison * multiplier;
+  });
+  rows.forEach(function (row) { body.appendChild(row); });
+
+  table.querySelectorAll('th[aria-sort]').forEach(function (header) { header.removeAttribute('aria-sort'); });
+  table.querySelectorAll('.table-sort').forEach(function (control) { delete control.dataset.direction; });
+  button.dataset.direction = direction;
+  button.parentElement.setAttribute('aria-sort', direction === 'asc' ? 'ascending' : 'descending');
+}
+
+function sortModuleQuality(columnIndex, numeric, button) {
+  sortQualityTable('module-quality-table', columnIndex, numeric, button);
+}
+
+function sortDirectoryComplexity(columnIndex, numeric, button) {
+  sortQualityTable('directory-complexity-table', columnIndex, numeric, button);
+}
+</script>
+</body>
+</html>

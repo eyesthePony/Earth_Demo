@@ -1,11 +1,11 @@
-import { _decorator, Component, Node, UITransform, Vec3, view } from 'cc';
+import { _decorator, UITransform, Vec3, view } from 'cc';
 import { BasePlane } from '../BasePlane';
 import { BulletManager } from '../../../Manager/BulletManager';
 import { EventBus } from '../../../Core/EventBus';
 import { GameConstants } from '../../../Core/GameConstants';
 import { EffectManager } from '../../../Core/EffectManager';
 import { AudioManager } from '../../../Core/AudioManager';
-const { ccclass, property } = _decorator;
+const { ccclass} = _decorator;
 
 @ccclass('EnemyPlane')
 export class EnemyPlane extends BasePlane  {
@@ -88,8 +88,6 @@ export class EnemyPlane extends BasePlane  {
         EffectManager.instance.play(GameConstants.EFFECT_TYPE.EXPLOSION, pos ,2);
         AudioManager.instance.playOneShot(GameConstants.AUDIO_TYPE.BOOM,1);
         EventBus.dispatchEvent(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.node);
-        
-
     }
 
     

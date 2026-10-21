@@ -1,7 +1,7 @@
-import { _decorator, Button, Component, Node } from 'cc';
+import { _decorator, Button, Component } from 'cc';
 import { EventBus } from '../Core/EventBus';
 import { GameConstants } from '../Core/GameConstants';
-const { ccclass, property } = _decorator;
+const { ccclass} = _decorator;
 
 @ccclass('ReStart')
 export class ReStart extends Component {

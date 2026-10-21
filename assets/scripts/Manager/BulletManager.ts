@@ -1,4 +1,4 @@
-import { _decorator, Component, instantiate, Node, Prefab, Vec3 } from 'cc';
+import { _decorator, Component, Node, Prefab, Vec3 } from 'cc';
 import { BaseBullet } from '../Entity/bullet/BaseBullet';
 import{PoolManager} from '../Core/PoolManager';
 import { EventBus } from '../Core/EventBus';

@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Prefab, Vec3,Animation} from 'cc';
+import { _decorator, Component, Prefab, Vec3,Animation} from 'cc';
 import { PoolManager } from './PoolManager';
 import { EventBus } from './EventBus';
 import { GameConstants } from './GameConstants';

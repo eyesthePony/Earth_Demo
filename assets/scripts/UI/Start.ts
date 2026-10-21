@@ -1,11 +1,14 @@
-import { _decorator, Button, Component, director, Node } from 'cc';
-import { EventBus } from '../Core/EventBus';
+import { _decorator, Button, Component, director } from 'cc';
 import { GameConstants } from '../Core/GameConstants';
-const { ccclass, property } = _decorator;
+import { GameData } from '../Core/GameData';
+const { ccclass,property } = _decorator;
 
 @ccclass('Start')
 export class Start extends Component {
-     onLoad() {
+    @property
+    levelId:number = 1;
+
+    onLoad() {
         this.node.on(Button.EventType.CLICK, this.onClick, this);
     }
 
@@ -14,6 +17,7 @@ export class Start extends Component {
     }
 
     private onClick() {
+        GameData.selectedLevel = this.levelId;
         director.loadScene(GameConstants.GAME_SCENE.BATTLE);
     }
 }
