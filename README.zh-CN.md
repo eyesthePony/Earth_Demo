@@ -1,4 +1,4 @@
-[English](./README.md) | **简体中文**
+[English](README.md) | [简体中文](README.zh-CN.md)
 
 **Earth_Demo** 是一款基于 Cocos Creator 开发的 **Roguelike 自动开火弹幕射击游戏 (Auto-fire Bullet-hell)**。
 
