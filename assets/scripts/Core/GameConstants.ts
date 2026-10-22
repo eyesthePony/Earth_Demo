@@ -41,6 +41,16 @@ export class GameConstants {
         BATTLE: 'BattleScene'
     }
 
+    //敌机类型
+    public static ENEMY_TYPE = {
+        NORMAL:'normal',
+        BOSS:'boss',
+    }
+
+    public static BULLET_TYPE = {
+        NORMAL:'normal',
+    }
+
     
 
     public static EFFECT_TYPE = {

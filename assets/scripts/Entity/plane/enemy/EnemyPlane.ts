@@ -13,7 +13,7 @@ export class EnemyPlane extends BasePlane  {
     private scrHeight = 0;
     private halfH = 0;      // 飞机半高
     private bottomY = 0;
-    private _shootDir = new Vec3(0, -1, 0);
+   
 
 
     /**
@@ -28,6 +28,8 @@ export class EnemyPlane extends BasePlane  {
         const ut = this.getComponent(UITransform)!; //获取飞机的组件
         this.halfH = ut.height / 2;                 //飞机高度的一半
 
+        this._shootDir = new Vec3(0, -1, 0);  // 飞机子弹方向向下
+
     }
 
     /**
@@ -36,11 +38,14 @@ export class EnemyPlane extends BasePlane  {
      */
     public init(position: Vec3) {
         this.node.setPosition(position);//设置初始位置
-        this._invincibleTimer = 0; //设置被击中无敌时间
-        this.hp = 100;              //设置血量
+        this._invincibleTimer = 0; //设置被击中无敌时间倒计时
+        this._maxHp = 10;          //设置血量上限
+        this.hp = 10;              //设置血量
         this._isDead = false;      //死亡判断重置
         this._fireTimer = 0;          //开火时间
         this.fireCd = 1;         //开火间隔
+        this.invincibiltyDuration = 0; //无敌时间
+        this._shootDir.y = -1;
         this.enabled = true; 
     }
 
@@ -58,28 +63,16 @@ export class EnemyPlane extends BasePlane  {
             EventBus.dispatchEvent(GameConstants.EVENT_TYPE.ENEMY_ESCAPED, this.node);
             return;
         }
-      
-        // CD冷却完毕发射子弹
-        if (this._fireTimer <= 0) {
-            this.shoot();
-            this._fireTimer += this.fireCd;
-        }
     }
 
 
 
     shoot(){
-        BulletManager.instance.spawnBullet(false, this.node.position, this._shootDir, 10, 500);
+        BulletManager.instance.spawnBullet(GameConstants.BULLET_TYPE.NORMAL,false, this.node.worldPosition, this._shootDir, 10, 500);
     }
 
 
-    takeDamage(damage: number) {
-        if (this.hp <= 0) return; 
-        this.hp -= damage;
-        if (this.hp <= 0) {
-            this.onDeath();
-        }
-    }
+    
 
     protected onDeath(): void {
         if(this._isDead) return;

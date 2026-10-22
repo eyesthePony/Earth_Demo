@@ -2,7 +2,7 @@ import { _decorator, Component, Node, Prefab, view, Vec3 } from 'cc';
 import { PoolManager } from '../Core/PoolManager';
 import { EventBus } from '../Core/EventBus';
 import { GameConstants } from '../Core/GameConstants';
-import { EnemyPlane } from '../Entity/plane/enemy/EnemyPlane';
+import { BasePlane } from '../Entity/plane/BasePlane';
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemyManager')
@@ -11,7 +11,10 @@ export class EnemyManager extends Component {
     private static _instance:EnemyManager = null;
 
     @property(Prefab)
-    enemyPrefab: Prefab = null!;
+    normalEnemyPrefab: Prefab = null!;
+
+    @property(Prefab)
+    bossPrefab: Prefab = null!;
 
     @property({ tooltip: "生成间隔（秒）" })
     spawnRate = 1;
@@ -47,10 +50,10 @@ export class EnemyManager extends Component {
     }
 
     private onStateChanged(state:string){
-        // 游戏开始，启动定时器
+        // 游戏开始，启动飞机
         if(state === GameConstants.GAME_STATE.PLAYING){
             this.setEnemiesEabled(true);
-        }else{//游戏暂停，关闭定时器。
+        }else{//游戏暂停，关闭飞机。
             this.setEnemiesEabled(false);
         }
     }
@@ -59,7 +62,7 @@ export class EnemyManager extends Component {
         const enemies = this.node.children;
 
         for(let i = enemies.length - 1;i >= 0;--i){
-            const enemy = enemies[i].getComponent(EnemyPlane);
+            const enemy = enemies[i].getComponent(BasePlane);
             if(enemy){
                 enemy.enabled = isEnabled;
             }   
@@ -73,29 +76,43 @@ export class EnemyManager extends Component {
    
 
     private onHit(enemyNode: Node, damage:number){
-       const plane =  enemyNode.getComponent(EnemyPlane);
+       const plane =  enemyNode.getComponent(BasePlane);
        if (!plane) return;
        plane.takeDamage(damage);
     }
 
-    public spawnEnemy() {
-        if (!this.enemyPrefab) return;
+    public spawnEnemy(enemyType:string) {
+        let prefabToSpawn:Prefab = null;
+        let spawnX = 0; // 默认 X 坐标为 0（屏幕中间）
 
-        const enemy = PoolManager.instance.getNode(this.enemyPrefab, this.node);
-        const plane = enemy.getComponent(EnemyPlane);
+        //生成不同类型敌机
+        switch(enemyType){
+            case GameConstants.ENEMY_TYPE.BOSS:
+                prefabToSpawn = this.bossPrefab;
+                break;
+            case GameConstants.ENEMY_TYPE.NORMAL:
+            default: // 防止配表写错导致崩溃，默认按普通怪处理
+                prefabToSpawn = this.normalEnemyPrefab;
+                // 普通怪：随机 X，范围在屏幕内缩一点
+                const halfW = 50;
+                const minX = -this.scrWidth / 2 + halfW;
+                const maxX = this.scrWidth / 2 - halfW;
+                spawnX = minX + Math.random() * (maxX - minX);
+        }
 
-        // 随机 X，范围在屏幕内缩一点
-        const halfW = 50;
-        const minX = -this.scrWidth / 2 + halfW;
-        const maxX = this.scrWidth / 2 - halfW;
-        const randomX = minX + Math.random() * (maxX - minX);
-        const position = new Vec3(randomX, this.topY + 100, 0);
+        if (!prefabToSpawn) return;
+
+        const enemy = PoolManager.instance.getNode(prefabToSpawn, this.node);
+        const plane = enemy.getComponent(BasePlane);
+
+        const position = new Vec3(spawnX, this.topY + 100, 0);
         // 从屏幕顶外面生成
         plane.init(position);
     }
 
+    
+
     onDestroy() {
-        this.unschedule(this.spawnEnemy);
         EventBus.off(GameConstants.EVENT_TYPE.GAME_RESET,this.onGameReset,this);
         EventBus.off(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED,this.onStateChanged,this);
         EventBus.off(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.onEnemyRecycle, this);

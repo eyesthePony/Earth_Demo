@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Prefab, Vec3 } from 'cc';
+import { _decorator, Component, Game, Node, Prefab, Vec3 } from 'cc';
 import { BaseBullet } from '../Entity/bullet/BaseBullet';
 import{PoolManager} from '../Core/PoolManager';
 import { EventBus } from '../Core/EventBus';
@@ -11,10 +11,10 @@ export class BulletManager extends Component {
     static instance: BulletManager = null!;   
 
     @property(Prefab)
-    playerBulletPrefab: Prefab = null;
+    normalPlayerBulletPrefab: Prefab = null;
 
     @property(Prefab)
-    enemyBulletPrefab: Prefab = null;
+    normalEnemyBulletPrefab:Prefab = null;
 
     
 
@@ -54,11 +54,23 @@ export class BulletManager extends Component {
     }
 
     
-    public spawnBullet(isPlayerBullet: boolean, spawnPos: Vec3, dir: Vec3, damage: number, speed: number): void {
-        const prefab = isPlayerBullet ? this.playerBulletPrefab : this.enemyBulletPrefab;
-        
+    public spawnBullet(bulletType:string,isPlayerBullet: boolean, spawnPos: Vec3, dir: Vec3, damage: number, speed: number): void {
+        let bulletprefab = null;
+        switch(bulletType){
+            case GameConstants.BULLET_TYPE.NORMAL:
+            default:
+                if(isPlayerBullet){
+                    bulletprefab = this.normalPlayerBulletPrefab; 
+                }else{
+                    bulletprefab = this.normalEnemyBulletPrefab;
+                }
+
+        }
+
+        if(!bulletprefab) return;
+
         // 从 PoolManager 取，没有就新建
-        let bulletNode = PoolManager.instance.getNode(prefab, this.node);
+        let bulletNode = PoolManager.instance.getNode(bulletprefab, this.node);
 
         const bulletComp = bulletNode.getComponent(BaseBullet);
         

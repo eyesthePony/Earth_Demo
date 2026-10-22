@@ -60,7 +60,7 @@ export class WaveManager extends Component {
     }
 
     private spawnEnemy() {   
-        EnemyManager.instance.spawnEnemy();
+        EnemyManager.instance.spawnEnemy(this._waveData.enemyType);
         --this._toSpawn;    //还需要生成的飞机-1
         ++this._aliveEnemies;  //还存活的飞机数量+1
         this._spawnTimer += this._waveData.spawnInterval; // 重置计时器

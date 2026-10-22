@@ -4,20 +4,20 @@ import { BasePlane } from '../BasePlane';
 import{BulletManager} from '../../../Manager/BulletManager';
 import { EventBus } from '../../../Core/EventBus';
 import { GameConstants } from '../../../Core/GameConstants';
-const { ccclass} = _decorator;
+const { ccclass, property} = _decorator;
 
 @ccclass('player')
 export class player extends  BasePlane {
 
    
-
+    @property(Node) 
+    muzzle: Node = null!; // 枪口位置
     private scrWidth = 0;
     private scrHeight = 0;
     private halfW = 0;      // 飞机半宽
     private halfH = 0;      // 飞机半高
     private isSelected = false;
-    private _shootDir = new Vec3(0, 1, 0);
-    
+   
 
 
     onLoad() {
@@ -30,19 +30,23 @@ export class player extends  BasePlane {
         this.halfW = ut.width * ut.anchorX;         // 锚点左侧宽度
         this.halfH = ut.height * ut.anchorY;        // 锚点下侧高度
 
-        // 注册触摸【补上！】
+        this._shootDir = new Vec3(0, 1, 0);  // 飞机子弹方向
+
+        // 注册触摸
         this.addTouchListeners();
 
+        //游戏重开事件
         EventBus.on(GameConstants.EVENT_TYPE.GAME_RESET,this.onGameReset,this);
+        //游戏状态变化事件，除了游玩状态，其他状态设enable为false
         EventBus.on(GameConstants.EVENT_TYPE.GAME_STATE_CHANGED, this.onStateChanged, this);
+        //被敌方子弹击中事件
         EventBus.on(GameConstants.EVENT_TYPE.ENEMY_BULLET_HIT, this.onHit, this);
 
     }
 
     private onGameReset(){
-                // 1. 显示玩家节点
+        // 1. 显示玩家节点
         this.node.active = true;
-        
         
         // 3. 重置逻辑状态
         this._isDead = false;
@@ -61,12 +65,7 @@ export class player extends  BasePlane {
         if(this._isDead) return;
         // 执行基类update：无敌计时、开火计时、死亡判断
         super.update(deltaTime);
-
-        // CD冷却完毕发射子弹
-        if (this._fireTimer <= 0) {
-            this.shoot();
-            this._fireTimer += this.fireCd;
-        }
+        
     }
 
     onStateChanged(state:string){
@@ -127,7 +126,7 @@ export class player extends  BasePlane {
     }
 
     shoot(){
-        BulletManager.instance.spawnBullet(true, this.node.position, this._shootDir, 10, 500);
+        BulletManager.instance.spawnBullet(GameConstants.BULLET_TYPE.NORMAL,true, this.muzzle.worldPosition, this._shootDir, 10, 500);
     }
 
     onHit(playerNode: Node, damage:number){

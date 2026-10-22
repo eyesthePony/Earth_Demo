@@ -33,10 +33,15 @@ export class BaseBullet extends Component {
     // 新增：显式初始化
     public init(isPlayerBullet: boolean, dir: Vec3, damage: number, speed: number, startPos: Vec3) {
         this.playerBullet = isPlayerBullet;
+        if(isPlayerBullet){
+            this.getComponent(Collider2D).group = GameConstants.ITEM_GROUP.SELF_BULLET;
+        }else{
+            this.getComponent(Collider2D).group = GameConstants.ITEM_GROUP.ENEMY_BULLET
+        }
         this.damage = damage;
         this.speed = speed;
         this._direction.set(dir);
-        this.node.setPosition(startPos);
+        this.node.setWorldPosition(startPos);  // 不是 setPosition
         this._startPos.set(startPos);   // ← 在这里记，位置已经对
         this._isDead = false;
         this.enabled = true; 
