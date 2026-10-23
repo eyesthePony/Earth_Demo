@@ -1,17 +1,13 @@
-import { EventBus } from "../../../Core/EventBus";
 import { GameConstants } from "../../../Core/GameConstants";
 import { BulletManager } from "../../../Manager/BulletManager";
-import { BasePlane } from "../BasePlane";
-import { _decorator, tween, UITransform, Vec3, view } from 'cc';
+import { _decorator, Vec3} from 'cc';
+import { BaseBoss } from "./BaseBoss";
 const { ccclass} = _decorator;
 
 @ccclass('PurpleBoss')
-export class PurpleBoss extends BasePlane {
+export class PurpleBoss extends BaseBoss {
 
-    private _phase:number = 1;
-
-    //正在入场，boss无敌
-    private _isEntering = true;
+ 
 
     //控制左右移动，使用sin，patrolTime根据时间周期来回移动，
     private _patrolTime = 0;
@@ -26,39 +22,17 @@ export class PurpleBoss extends BasePlane {
 
 
     public init(pos: Vec3) {
-        this.node.setPosition(pos);//设置初始位置
-        this._invincibleTimer = 0; //设置被击中无敌时间倒计时
+        super.init(pos);
         this._maxHp = 1000;          //设置血量上限
         this.hp = 1000;              //设置血量
-        this._isDead = false;      //死亡判断重置
         this._fireTimer = 0;          //开火时间
         this.fireCd = 2;         //开火间隔
-        this.invincibiltyDuration = 0; //无敌时间
         this._shootDir.y = -1;
-        this._phase = 1;       //重置阶段
         this._patrolSpeed = 1;  //重置移速
-        this._patrolTime = 0;  //重置时间
-        this._isEntering = true; //重置开场 
-        this.enabled = true; 
-
-        // 清空可能残留的 Tween 动画
-        tween(this.node).stop();
-        
-        // 2秒慢慢飘进来
-        const visibleSize = view.getVisibleSize();
-        const ut = this.getComponent(UITransform)!;
-        
-        // ✅ 修正位置：停在距离屏幕顶端往下大约 200 像素的位置
-        // 假设屏幕中心是 0，顶部就是 visibleSize.height / 2
-        const targetY = visibleSize.height / 2 - ut.height / 2 - 150; 
-        const targetPos = new Vec3(0, targetY, 0);
-        tween(this.node)
-        .to(2, { position: targetPos }, { easing: 'sineOut' })
-        .call(() => {
-            this._isEntering = false; //入场结束，可以射击和被伤害了
-        })
-        .start();
+        this._patrolTime = 0;  //重置时间   
     }
+
+ 
 
     update(deltaTime: number) {
         if(this.isDead) return;
@@ -79,10 +53,8 @@ export class PurpleBoss extends BasePlane {
     }
 
 
-    public takeDamage(damage: number): void {
-        if (this.hp <= 0 || this._isEntering) return;
-        this.hp -= damage;
-
+     // 留给子类重写：血量低于阈值时干嘛？
+    protected checkPhase() {
         // 血量阶段切换
         if (this.hp < this._maxHp * 0.66 && this._phase === 1) {
             this._phase = 2;
@@ -94,15 +66,8 @@ export class PurpleBoss extends BasePlane {
             this.fireCd = 0.4;
             this._patrolSpeed = 3;
         }
-
-        if (this.hp <= 0) this.onDeath();
     }
 
-    protected onDeath(): void {
-        if(this._isDead) return;
-        this._isDead = true;
-        EventBus.dispatchEvent(GameConstants.EVENT_TYPE.ENEMY_KILLED, this.node);
-    }
 
     protected shoot(): void {
         BulletManager.instance.spawnBullet(GameConstants.BULLET_TYPE.NORMAL,false, this.node.worldPosition, this._shootDir, 10, 500);

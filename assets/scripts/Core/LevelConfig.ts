@@ -32,6 +32,15 @@ export const LEVELS: LevelData[] = [
             { enemyType: GameConstants.ENEMY_TYPE.NORMAL, count: 1, delay: 0.8, spawnInterval: 0.1 },
             { enemyType: GameConstants.ENEMY_TYPE.BOSS, count: 1, delay: 2.0, spawnInterval: 0},
         ],
+    },
+    {
+        levelId:2,
+        levelName: "冰原边境",
+        backgroundRes: '',  
+        bgmRes: '',      
+        waves: [
+            { enemyType: GameConstants.ENEMY_TYPE.BOSS, count: 1, delay: 2.0, spawnInterval: 0},
+        ],
     }
 ];
 
